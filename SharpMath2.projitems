@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>{53290E9B-7A54-4098-AB3D-E936D93BDF97}</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SharpMath2</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\AxisAlignedLine2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Line2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Math2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Polygon2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Rect2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Shape2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\ShapeUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\RelativeRectangle2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft\Xna\Framework\Vector2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft\Xna\Framework\Point.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Microsoft\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Microsoft\Xna\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Microsoft\Xna\Framework\" />
+  </ItemGroup>
+</Project>
