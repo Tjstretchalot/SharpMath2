@@ -31,6 +31,29 @@ namespace SharpMath2
 		}
 
 		/// <summary>
+		/// Finds a vector that is perpendicular to the specified vector.
+		/// </summary>
+		/// <returns>A vector perpendicular to v</returns>
+		/// <param name="v">Vector</param>
+		public static Vector2 Perpendicular(Vector2 v)
+		{
+			return new Vector2(-v.Y, v.X);
+		}
+
+		/// <summary>
+		/// Finds the dot product of (x1, y1) and (x2, y2)
+		/// </summary>
+		/// <returns>The dot.</returns>
+		/// <param name="x1">The first x value.</param>
+		/// <param name="y1">The first y value.</param>
+		/// <param name="x2">The second x value.</param>
+		/// <param name="y2">The second y value.</param>
+		public static float Dot(float x1, float y1, float x2, float y2)
+		{
+			return x1 * x2 + y1 * y2;
+		}
+
+		/// <summary>
 		/// Determines if f1 and f2 are approximately the same.
 		/// </summary>
 		/// <returns>The approximately.</returns>

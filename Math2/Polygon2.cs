@@ -24,6 +24,11 @@ namespace SharpMath2
         /// </summary>
         public readonly List<Vector2> Normals;
 
+		/// <summary>
+		/// The bounding box.
+		/// </summary>
+		public readonly Rect2 AABB;
+
         /// <summary>
         /// Initializes a polygon with the specified vertices
         /// </summary>
@@ -39,15 +44,26 @@ namespace SharpMath2
             Vector2 tmp;
             for(int i = 1; i < vertices.Length; i++)
             {
-                tmp = Vector2.Normalize(Vector2.Perpendicular(vertices[i] - vertices[i - 1]));
+                tmp = Vector2.Normalize(Math2.Perpendicular(vertices[i] - vertices[i - 1]));
 
                 if (!Normals.Contains(tmp))
                     Normals.Add(tmp);
             }
 
-            tmp = Vector2.Normalize(Vector2.Perpendicular(vertices[0] - vertices[vertices.Length - 1]));
+            tmp = Vector2.Normalize(Math2.Perpendicular(vertices[0] - vertices[vertices.Length - 1]));
             if (!Normals.Contains(tmp))
                 Normals.Add(tmp);
+
+			var min = new Vector2(vertices[0].X, vertices[0].Y);
+			var max = new Vector2(min.X, min.Y);
+			for (int i = 1; i < vertices.Length; i++)
+			{
+				min.X = Math.Min(min.X, vertices[i].X);
+				min.Y = Math.Min(min.Y, vertices[i].Y);
+				max.X = Math.Max(max.X, vertices[i].X);
+				max.Y = Math.Max(max.Y, vertices[i].Y);
+			}
+			AABB = new Rect2(min, max);
         }
         
         /// <summary>
@@ -97,7 +113,7 @@ namespace SharpMath2
                 }
             }
 
-            return Vector2.ScalarMult(bestAxis.Value, bestMagn.Value);
+            return bestAxis.Value * bestMagn.Value;
         }
 
         /// <summary>
@@ -146,5 +162,70 @@ namespace SharpMath2
         {
             return ProjectAlongAxis(axis, pos, poly.Vertices);
         }
+
+		/// <summary>
+		/// Calculates the shortest distance from the specified polygon to the specified point,
+		/// and the axis from polygon to pos.
+		/// 
+		/// Returns null if pt is contained in the polygon.
+		/// </summary>
+		/// <returns>The distance form poly to pt.</returns>
+		/// <param name="pos">Origin of the polygon</param>
+		/// <param name="pt">Point to check.</param>
+		public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Vector2 pt)
+		{
+			float? res = null;
+			Vector2 axis = Vector2.Zero;
+			foreach(var norm in poly.Normals) 
+			{
+				var proj = ProjectAlongAxis(poly, pos, norm);
+				var ptProj = Vector2.Dot(pos, norm);
+
+				var distTo = AxisAlignedLine2.MinDistance(proj, ptProj);
+				if (!distTo.HasValue)
+					return null;
+
+				if (!res.HasValue || distTo.Value < res.Value)
+				{
+					res = distTo;
+					axis = norm;
+				}
+			}
+
+			return Tuple.Create(axis, res.Value);
+		}
+
+		/// <summary>
+		/// Calculates the shortest distance and direction to go from pos1 to pos2. Returns null
+		/// if the polygons intersect.
+		/// </summary>
+		/// <returns>The distance.</returns>
+		/// <param name="poly1">Poly1.</param>
+		/// <param name="pos1">Pos1.</param>
+		/// <param name="poly2">Poly2.</param>
+		/// <param name="pos2">Pos2.</param>
+		public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Vector2 pos1, Polygon2 poly2, Vector2 pos2)
+		{
+			float? res = null;
+			Vector2 axis = Vector2.Zero;
+
+			foreach(var norm in poly1.Normals.Union(poly2.Normals))
+			{
+				var proj1 = ProjectAlongAxis(poly1, pos1, norm);
+				var proj2 = ProjectAlongAxis(poly2, pos2, norm);
+
+				var distTo = AxisAlignedLine2.MinDistance(proj1, proj2);
+				if (!distTo.HasValue)
+					return null;
+
+				if(!res.HasValue || distTo.Value < res.Value)
+				{
+					res = distTo;
+					axis = norm;
+				}
+			}
+
+			return Tuple.Create(axis, res.Value);
+		}
     }
 }

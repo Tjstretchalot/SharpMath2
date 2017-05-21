@@ -158,6 +158,96 @@ namespace SharpMath2
                 return min <= point && max >= point;
         }
 
+		/// <summary>
+		/// Detrmines the shortest distance from the line to get to point. Returns
+		/// null if the point is on the line (not strict). Always returns a positive value.
+		/// </summary>
+		/// <returns>The distance.</returns>
+		/// <param name="line">Line.</param>
+		/// <param name="point">Point.</param>
+		public static float? MinDistance(AxisAlignedLine2 line, float point)
+		{
+			return MinDistance(line.Min, line.Max, point, false);
+		}
+
+		/// <summary>
+		/// Determines the shortest distance for line1 to go to touch line2. Returns
+		/// null if line1 and line 2 intersect (not strictly)
+		/// </summary>
+		/// <returns>The distance.</returns>
+		/// <param name="line1">Line1.</param>
+		/// <param name="line2">Line2.</param>
+		public static float? MinDistance(AxisAlignedLine2 line1, AxisAlignedLine2 line2)
+		{
+			return MinDistance(line1.Min, line1.Max, line2.Min, line2.Max, false);
+		}
+
+		/// <summary>
+		/// Determines the shortest distance from the line (min, max) to the point. Returns
+		/// null if the point is on the line (not strict). Always returns a positive value.
+		/// </summary>
+		/// <returns>The distance.</returns>
+		/// <param name="min">Minimum of line.</param>
+		/// <param name="max">Maximum of line.</param>
+		/// <param name="point">Point to check.</param>
+		/// <param name="correctMinMax">If set to <c>true</c> will correct minimum max being reversed if they are</param>
+		public static float? MinDistance(float min, float max, float point, bool correctMinMax = true)
+		{
+			if (correctMinMax)
+			{
+				float tmp1 = min, tmp2 = max;
+				min = Math.Min(tmp1, tmp2);
+				max = Math.Max(tmp1, tmp2);
+			}
+
+			if (point < min)
+				return min - point;
+			else if (point > max)
+				return point - max;
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Calculates the shortest distance for line1 (min1, max1) to get to line2 (min2, max2).
+		/// Returns null if line1 and line2 intersect (not strictly)
+		/// </summary>
+		/// <returns>The distance along the mutual axis or null.</returns>
+		/// <param name="min1">Min1.</param>
+		/// <param name="max1">Max1.</param>
+		/// <param name="min2">Min2.</param>
+		/// <param name="max2">Max2.</param>
+		/// <param name="correctMinMax">If set to <c>true</c> correct minimum max being potentially reversed.</param>
+		public static float? MinDistance(float min1, float max1, float min2, float max2, bool correctMinMax = true)
+		{
+			if (correctMinMax)
+			{
+				float tmp1 = min1, tmp2 = max1;
+				min1 = Math.Min(tmp1, tmp2);
+				max1 = Math.Max(tmp1, tmp2);
+
+				tmp1 = min2;
+				tmp2 = max2;
+				min2 = Math.Min(tmp1, tmp2);
+				max2 = Math.Max(tmp1, tmp2);
+			}
+
+			if (min1 < min2)
+			{
+				if (max1 < min2)
+					return min2 - max1;
+				else
+					return null;
+			}else if(min2 < min1)
+			{
+				if (max2 < min1)
+					return min1 - max2;
+				else
+					return null;
+			}
+
+			return null;
+		}
         
 
         public override string ToString()

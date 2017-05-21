@@ -103,7 +103,7 @@ namespace SharpMath2
                 }
             }
 
-            return Vector2.ScalarMult(bestAxis, bestMagn);
+            return bestAxis * bestMagn;
         }
 
         /// <summary>
@@ -213,12 +213,12 @@ namespace SharpMath2
         /// <returns>Projection of polygon of points at pos along axis</returns>
         protected static AxisAlignedLine2 ProjectAlongAxis(Vector2 axis, Vector2 pos, params Vector2[] points)
         {
-            float min = Vector2.DotProduct(points[0].X + pos.X, points[0].Y + pos.Y, axis.X, axis.Y);
+            float min = Math2.Dot(points[0].X + pos.X, points[0].Y + pos.Y, axis.X, axis.Y);
             float max = min;
 
             for (int i = 1; i < points.Length; i++)
             {
-                var tmp = Vector2.DotProduct(points[i].X + pos.X, points[i].Y + pos.Y, axis.X, axis.Y);
+                var tmp = Math2.Dot(points[i].X + pos.X, points[i].Y + pos.Y, axis.X, axis.Y);
                 min = Math.Min(min, tmp);
                 max = Math.Max(max, tmp);
             }

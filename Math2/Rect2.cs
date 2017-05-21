@@ -16,6 +16,7 @@ namespace SharpMath2
         public readonly Vector2 Max;
         public readonly Vector2 UpperRight;
         public readonly Vector2 LowerLeft;
+		public readonly Vector2 Center;
         public readonly float Width;
         public readonly float Height;
 
@@ -47,6 +48,8 @@ namespace SharpMath2
             Max = max;
             UpperRight = new Vector2(Max.X, Min.Y);
             LowerLeft = new Vector2(Min.X, Max.Y);
+
+			Center = new Vector2((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2);
 
             Width = Max.X - Min.X;
             Height = Max.Y - Min.Y;

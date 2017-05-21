@@ -102,8 +102,8 @@ namespace SharpMath2
             
             Delta = End - Start;
             Axis = Vector2.Normalize(Delta);
-            Normal = Vector2.Normalize(Vector2.Perpendicular(Delta));
-            MagnitudeSquared = Vector2.MagnitudeSquared(Delta);
+            Normal = Vector2.Normalize(Math2.Perpendicular(Delta));
+			MagnitudeSquared = Delta.LengthSquared();
             Magnitude = (float)Math.Sqrt(MagnitudeSquared);
 
             MinX = Math.Min(Start.X, End.X);
