@@ -77,5 +77,20 @@ namespace SharpMath2
 		{
 			return Approximately(v1.X, v2.X, epsilon) && Approximately(v1.Y, v2.Y, epsilon);
 		}
+
+        /// <summary>
+        /// Rotates the specified vector about the specified vector a rotation of the
+        /// specified amount.
+        /// </summary>
+        /// <param name="vec">The vector to rotate</param>
+        /// <param name="about">The point to rotate vec around</param>
+        /// <param name="rotation">The rotation</param>
+        /// <returns>The vector vec rotated about about rotation.Theta radians.</returns>
+        public static Vector2 Rotate(Vector2 vec, Vector2 about, Rotation2 rotation)
+        {
+            var tmp = vec - about;
+            return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta,
+                               tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta);
+        }
 	}
 }
