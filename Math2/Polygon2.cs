@@ -49,14 +49,13 @@ namespace SharpMath2
             Vector2 tmp;
             for(int i = 1; i < vertices.Length; i++)
             {
-                tmp = Vector2.Normalize(Math2.Perpendicular(vertices[i] - vertices[i - 1]));
-
+                tmp = Math2.MakeStandardNormal(Vector2.Normalize(Math2.Perpendicular(vertices[i] - vertices[i - 1])));
                 if (!Normals.Contains(tmp))
                     Normals.Add(tmp);
             }
 
-            tmp = Vector2.Normalize(Math2.Perpendicular(vertices[0] - vertices[vertices.Length - 1]));
-            if (!Normals.Contains(tmp))
+            tmp = Math2.MakeStandardNormal(Vector2.Normalize(Math2.Perpendicular(vertices[0] - vertices[vertices.Length - 1])));
+            if (!Normals.Contains(tmp) && !Normals.Contains(-tmp))
                 Normals.Add(tmp);
 
 			var min = new Vector2(vertices[0].X, vertices[0].Y);

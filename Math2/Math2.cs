@@ -89,8 +89,24 @@ namespace SharpMath2
         public static Vector2 Rotate(Vector2 vec, Vector2 about, Rotation2 rotation)
         {
             var tmp = vec - about;
-            return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta,
-                               tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta);
+            return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta + about.X,
+                               tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta + about.Y);
+        }
+
+        /// <summary>
+        /// Returns either the vector or -vector such that MakeStandardNormal(vec) == MakeStandardNormal(-vec)
+        /// </summary>
+        /// <param name="vec">The vector</param>
+        /// <returns>Normal such that vec.X is positive (unless vec.X is 0, in which such that vec.Y is positive)</returns>
+        public static Vector2 MakeStandardNormal(Vector2 vec)
+        {
+            if (vec.X < 0)
+                return -vec;
+
+            if (vec.X == 0 && vec.Y < 0)
+                return -vec;
+
+            return vec;
         }
 	}
 }
