@@ -49,14 +49,6 @@ Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotatio
 Polygon2.Intersects(triangle, triangle, position1, position2, true); // False
 ```
 
-```cs
-var complicatedShape = ShapeUtils.CreateCircle(5); // radius 5, 32 segments
-
-// Note we are not providing rotation - rect2 does not support rotation 
-// (use ShapeUtils.CreateRectangle for that, which returns a Polygon2)
-Rect2.Intersects(complicatedShape.AABB, complicatedShape.AABB, Vector2.ZERO, new Vector2(3, 0), true); // True
-```
-
 ### Polygon collision detection + handling
 
 ```cs
@@ -123,6 +115,14 @@ supported (though not complicated).
 
 The provided AABB is most often used in UI elements which do not anticipate rotation and can have somewhat complicated
 polygons but don't have rotation, which is where AABBs shine.
+
+```cs
+var complicatedShape = ShapeUtils.CreateCircle(5); // radius 5, 32 segments
+
+// Note we are not providing rotation - rect2 does not support rotation 
+// (use ShapeUtils.CreateRectangle for that, which returns a Polygon2)
+Rect2.Intersects(complicatedShape.AABB, complicatedShape.AABB, Vector2.ZERO, new Vector2(3, 0), true); // True
+```
 
 ## Performance notes
 
