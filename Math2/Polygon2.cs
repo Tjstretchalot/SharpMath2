@@ -29,10 +29,10 @@ namespace SharpMath2
         /// </summary>
         public readonly List<Vector2> Normals;
 
-		/// <summary>
-		/// The bounding box.
-		/// </summary>
-		public readonly Rect2 AABB;
+        /// <summary>
+        /// The bounding box.
+        /// </summary>
+        public readonly Rect2 AABB;
 
         /// <summary>
         /// The longest line that can be created inside this polygon. 
@@ -57,7 +57,7 @@ namespace SharpMath2
 
             Normals = new List<Vector2>();
             Vector2 tmp;
-            for(int i = 1; i < vertices.Length; i++)
+            for (int i = 1; i < vertices.Length; i++)
             {
                 tmp = Math2.MakeStandardNormal(Vector2.Normalize(Math2.Perpendicular(vertices[i] - vertices[i - 1])));
                 if (!Normals.Contains(tmp))
@@ -68,26 +68,26 @@ namespace SharpMath2
             if (!Normals.Contains(tmp))
                 Normals.Add(tmp);
 
-			var min = new Vector2(vertices[0].X, vertices[0].Y);
-			var max = new Vector2(min.X, min.Y);
-			for (int i = 1; i < vertices.Length; i++)
-			{
-				min.X = Math.Min(min.X, vertices[i].X);
-				min.Y = Math.Min(min.Y, vertices[i].Y);
-				max.X = Math.Max(max.X, vertices[i].X);
-				max.Y = Math.Max(max.Y, vertices[i].Y);
-			}
-			AABB = new Rect2(min, max);
+            var min = new Vector2(vertices[0].X, vertices[0].Y);
+            var max = new Vector2(min.X, min.Y);
+            for (int i = 1; i < vertices.Length; i++)
+            {
+                min.X = Math.Min(min.X, vertices[i].X);
+                min.Y = Math.Min(min.Y, vertices[i].Y);
+                max.X = Math.Max(max.X, vertices[i].X);
+                max.Y = Math.Max(max.Y, vertices[i].Y);
+            }
+            AABB = new Rect2(min, max);
 
             Center = new Vector2(0, 0);
-            foreach(var vert in Vertices)
+            foreach (var vert in Vertices)
             {
                 Center += vert;
             }
             Center *= (1.0f / Vertices.Length);
 
             float longestAxisLenSq = -1;
-            for(int i = 1; i < vertices.Length; i++)
+            for (int i = 1; i < vertices.Length; i++)
             {
                 var vec = vertices[i] - vertices[i - 1];
                 longestAxisLenSq = Math.Max(longestAxisLenSq, vec.LengthSquared());
@@ -95,7 +95,7 @@ namespace SharpMath2
             longestAxisLenSq = Math.Max(longestAxisLenSq, (vertices[0] - vertices[vertices.Length - 1]).LengthSquared());
             LongestAxisLength = (float)Math.Sqrt(longestAxisLenSq);
         }
-        
+
         /// <summary>
         /// Determines if the first polygon intersects the second polygon when polygon one
         /// is at position 1 and polygon two is at position two.
@@ -199,76 +199,76 @@ namespace SharpMath2
             return ProjectAlongAxis(axis, pos, rot, poly.Center, poly.Vertices);
         }
 
-		/// <summary>
-		/// Calculates the shortest distance from the specified polygon to the specified point,
-		/// and the axis from polygon to pos.
-		/// 
-		/// Returns null if pt is contained in the polygon.
-		/// </summary>
-		/// <returns>The distance form poly to pt.</returns>
+        /// <summary>
+        /// Calculates the shortest distance from the specified polygon to the specified point,
+        /// and the axis from polygon to pos.
+        /// 
+        /// Returns null if pt is contained in the polygon.
+        /// </summary>
+        /// <returns>The distance form poly to pt.</returns>
         /// <param name="poly">The polygon</param>
-		/// <param name="pos">Origin of the polygon</param>
+        /// <param name="pos">Origin of the polygon</param>
         /// <param name="rot">Rotation of the polygon</param>
-		/// <param name="pt">Point to check.</param>
-		public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 pt)
-		{
-			float? res = null;
-			Vector2 axis = Vector2.Zero;
-			foreach(var normUnrot in poly.Normals) 
-			{
+        /// <param name="pt">Point to check.</param>
+        public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 pt)
+        {
+            float? res = null;
+            Vector2 axis = Vector2.Zero;
+            foreach (var normUnrot in poly.Normals)
+            {
                 var norm = Math2.Rotate(normUnrot, Vector2.Zero, rot);
-				var proj = ProjectAlongAxis(poly, pos, rot, norm);
-				var ptProj = Vector2.Dot(pos, norm);
+                var proj = ProjectAlongAxis(poly, pos, rot, norm);
+                var ptProj = Vector2.Dot(pos, norm);
 
-				var distTo = AxisAlignedLine2.MinDistance(proj, ptProj);
-				if (!distTo.HasValue)
-					return null;
+                var distTo = AxisAlignedLine2.MinDistance(proj, ptProj);
+                if (!distTo.HasValue)
+                    return null;
 
-				if (!res.HasValue || distTo.Value < res.Value)
-				{
-					res = distTo;
-					axis = norm;
-				}
-			}
+                if (!res.HasValue || distTo.Value < res.Value)
+                {
+                    res = distTo;
+                    axis = norm;
+                }
+            }
 
-			return Tuple.Create(axis, res.Value);
-		}
+            return Tuple.Create(axis, res.Value);
+        }
 
-		/// <summary>
-		/// Calculates the shortest distance and direction to go from pos1 to pos2. Returns null
-		/// if the polygons intersect.
-		/// </summary>
-		/// <returns>The distance.</returns>
-		/// <param name="poly1">First polygon</param>
+        /// <summary>
+        /// Calculates the shortest distance and direction to go from pos1 to pos2. Returns null
+        /// if the polygons intersect.
+        /// </summary>
+        /// <returns>The distance.</returns>
+        /// <param name="poly1">First polygon</param>
         /// <param name="poly2">Second polygon</param>
         /// <param name="pos1">Origin of first polygon</param>
         /// <param name="pos2">Origin of second polygon</param>
         /// <param name="rot1">Rotation of first polygon</param>
         /// <param name="rot2">Rotation of second polygon</param>
-		public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
-		{
-			float? res = null;
-			Vector2 axis = Vector2.Zero;
+        public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
+        {
+            float? res = null;
+            Vector2 axis = Vector2.Zero;
 
-			foreach(var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
-			{
+            foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
+            {
                 var newAxis = Math2.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
-				var proj1 = ProjectAlongAxis(poly1, pos1, rot1, newAxis);
-				var proj2 = ProjectAlongAxis(poly2, pos2, rot2, newAxis);
+                var proj1 = ProjectAlongAxis(poly1, pos1, rot1, newAxis);
+                var proj2 = ProjectAlongAxis(poly2, pos2, rot2, newAxis);
 
-				var distTo = AxisAlignedLine2.MinDistance(proj1, proj2);
-				if (!distTo.HasValue)
-					return null;
+                var distTo = AxisAlignedLine2.MinDistance(proj1, proj2);
+                if (!distTo.HasValue)
+                    return null;
 
-				if(!res.HasValue || distTo.Value < res.Value)
-				{
-					res = distTo;
-					axis = newAxis;
-				}
-			}
+                if (!res.HasValue || distTo.Value < res.Value)
+                {
+                    res = distTo;
+                    axis = newAxis;
+                }
+            }
 
-			return Tuple.Create(axis, res.Value);
-		}
+            return Tuple.Create(axis, res.Value);
+        }
 
         #region NoRotation
         /// <summary>

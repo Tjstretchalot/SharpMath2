@@ -34,11 +34,12 @@ namespace SharpMath2
         {
             if (float.IsInfinity(theta) || float.IsNaN(theta))
                 throw new ArgumentException($"Invalid theta: {theta}", nameof(theta));
-            if(theta < 0)
+            if (theta < 0)
             {
                 int numToAdd = (int)Math.Ceiling((-theta) / (Math.PI * 2));
                 theta += (float)Math.PI * 2 * numToAdd;
-            }else if(theta >= Math.PI * 2)
+            }
+            else if (theta >= Math.PI * 2)
             {
                 int numToReduce = (int)Math.Floor(theta / (Math.PI * 2));
                 theta -= (float)Math.PI * 2 * numToReduce;

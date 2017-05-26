@@ -26,7 +26,7 @@ namespace SharpMath2
         public static bool Intersects(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2, Rotation2 rot1, bool strict)
         {
             bool checkedX = false, checkedY = false;
-            for(int i = 0; i < poly.Normals.Count; i++)
+            for (int i = 0; i < poly.Normals.Count; i++)
             {
                 var norm = Math2.Rotate(poly.Normals[i], Vector2.Zero, rot1);
                 if (!IntersectsAlongAxis(poly, rect, pos1, pos2, rot1, strict, norm))
@@ -63,14 +63,14 @@ namespace SharpMath2
             Vector2 bestAxis = Vector2.Zero;
             float bestMagn = float.MaxValue;
 
-            for(int i = 0; i < poly.Normals.Count; i++)
+            for (int i = 0; i < poly.Normals.Count; i++)
             {
                 var norm = Math2.Rotate(poly.Normals[i], Vector2.Zero, rot1);
                 var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, norm);
                 if (!mtv.HasValue)
                     return null;
-                
-                if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
+
+                if (Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = norm;
                     bestMagn = mtv.Value;
@@ -82,26 +82,26 @@ namespace SharpMath2
                     checkedX = true;
             }
 
-            if(!checkedX)
+            if (!checkedX)
             {
                 var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, Vector2.UnitX);
                 if (!mtv.HasValue)
                     return null;
-                
-                if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
+
+                if (Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = Vector2.UnitX;
                     bestMagn = mtv.Value;
                 }
             }
 
-            if(!checkedY)
+            if (!checkedY)
             {
                 var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, Vector2.UnitY);
                 if (!mtv.HasValue)
                     return null;
 
-                if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
+                if (Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = Vector2.UnitY;
                     bestMagn = mtv.Value;
@@ -124,7 +124,7 @@ namespace SharpMath2
         public static Vector2? IntersectMTV(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2)
         {
             var res = IntersectMTV(poly, rect, pos2, pos1, rot2);
-            return res.HasValue ? -res.Value : res; 
+            return res.HasValue ? -res.Value : res;
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace SharpMath2
 
             return AxisAlignedLine2.Intersects(proj1, proj2, strict);
         }
-        
+
         /// <summary>
         /// Determines if the specified rectangle and polygon where rect is at pos1 and poly is at pos2 intersect 
         /// along the specified axis.
@@ -229,7 +229,7 @@ namespace SharpMath2
         {
             float min = 0;
             float max = 0;
-            
+
             for (int i = 0; i < points.Length; i++)
             {
                 var polyPt = Math2.Rotate(points[i], center, rot);

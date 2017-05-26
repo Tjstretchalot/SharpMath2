@@ -16,7 +16,7 @@ namespace SharpMath2
         public readonly Vector2 Max;
         public readonly Vector2 UpperRight;
         public readonly Vector2 LowerLeft;
-		public readonly Vector2 Center;
+        public readonly Vector2 Center;
         public readonly float Width;
         public readonly float Height;
 
@@ -49,7 +49,7 @@ namespace SharpMath2
             UpperRight = new Vector2(Max.X, Min.Y);
             LowerLeft = new Vector2(Min.X, Max.Y);
 
-			Center = new Vector2((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2);
+            Center = new Vector2((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2);
 
             Width = Max.X - Min.X;
             Height = Max.Y - Min.Y;
@@ -65,7 +65,7 @@ namespace SharpMath2
         public Rect2(float minX, float minY, float maxX, float maxY) : this(new Vector2(minX, minY), new Vector2(maxX, maxY))
         {
         }
-        
+
         /// <summary>
         /// Determines if box1 with origin pos1 intersects box2 with origin pos2.
         /// </summary>

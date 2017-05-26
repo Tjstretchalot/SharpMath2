@@ -21,7 +21,7 @@ namespace SharpMath2
         /// Where the line ends
         /// </summary>
         public readonly Vector2 End;
-        
+
         /// <summary>
         /// End - Start
         /// </summary>
@@ -75,7 +75,7 @@ namespace SharpMath2
         /// Where this line would hit the y intercept. NaN if vertical line.
         /// </summary>
         public readonly float YIntercept;
-        
+
         /// <summary>
         /// If this line is horizontal
         /// </summary>
@@ -99,11 +99,11 @@ namespace SharpMath2
             Start = start;
             End = end;
 
-            
+
             Delta = End - Start;
             Axis = Vector2.Normalize(Delta);
             Normal = Vector2.Normalize(Math2.Perpendicular(Delta));
-			MagnitudeSquared = Delta.LengthSquared();
+            MagnitudeSquared = Delta.LengthSquared();
             Magnitude = (float)Math.Sqrt(MagnitudeSquared);
 
             MinX = Math.Min(Start.X, End.X);
@@ -115,7 +115,7 @@ namespace SharpMath2
 
             if (Vertical)
                 Slope = float.PositiveInfinity;
-            else 
+            else
                 Slope = (End.Y - Start.Y) / (End.X - Start.X);
 
             if (Vertical)
@@ -128,7 +128,7 @@ namespace SharpMath2
                 YIntercept = Start.Y - Slope * Start.X;
             }
         }
-        
+
         /// <summary>
         /// Determines if line1 intersects line2, when line1 is offset by pos1 and line2 
         /// is offset by pos2.
@@ -141,15 +141,17 @@ namespace SharpMath2
         /// <returns>If line1 intersects line2</returns>
         public static bool Intersects(Line2 line1, Line2 line2, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            if(line1.Horizontal && line2.Horizontal)
+            if (line1.Horizontal && line2.Horizontal)
             {
                 return AxisAlignedLine2.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.MinX + pos2.X, line2.MaxX + pos2.X, strict, false);
-            }else if(line1.Vertical && line2.Vertical)
+            }
+            else if (line1.Vertical && line2.Vertical)
             {
                 return AxisAlignedLine2.Intersects(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2.MinY + pos2.Y, line2.MaxY + pos2.Y, strict, false);
-            }else if(line1.Horizontal || line2.Horizontal)
+            }
+            else if (line1.Horizontal || line2.Horizontal)
             {
-                if(line2.Horizontal)
+                if (line2.Horizontal)
                 {
                     // swap line 1 and 2 to prevent duplicating everything
                     var tmp = line1;
@@ -160,11 +162,12 @@ namespace SharpMath2
                     pos2 = tmpp;
                 }
 
-                if(line2.Vertical)
+                if (line2.Vertical)
                 {
-                    return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.Start.X + pos2.X, strict, false) 
+                    return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.Start.X + pos2.X, strict, false)
                         && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line1.Start.Y + pos1.Y, strict, false);
-                }else
+                }
+                else
                 {
                     // recalculate line2 y intercept
                     // y = mx + b
@@ -177,15 +180,16 @@ namespace SharpMath2
                     // (line1.y - line2.yintercept) / line2.slope = line2.x
                     var line2XAtLine1Y = (line1.Start.Y + pos1.Y - line2YIntInner) / line2.Slope;
                     return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2XAtLine1Y, strict, false)
-                        && AxisAlignedLine2.Contains(line2.MinX + pos2.X, line2.MaxX + pos2.X, line2XAtLine1Y, strict, false); 
+                        && AxisAlignedLine2.Contains(line2.MinX + pos2.X, line2.MaxX + pos2.X, line2XAtLine1Y, strict, false);
                 }
-            }else if(line1.Vertical)
+            }
+            else if (line1.Vertical)
             {
                 // vertical line with regular line
                 var line2YIntInner = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
                 var line2YAtLine1X = line2.Slope * (line1.Start.X + pos1.X) + line2YIntInner;
                 return AxisAlignedLine2.Contains(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2YAtLine1X, strict, false)
-                    && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line2YAtLine1X, strict, false); 
+                    && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line2YAtLine1X, strict, false);
             }
 
             // two non-vertical, non-horizontal lines
@@ -200,8 +204,8 @@ namespace SharpMath2
 
                 // parallel lines with equal y intercept. Intersect if ever at same X coordinate.
                 return AxisAlignedLine2.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.MinX + pos2.X, line2.MaxX + pos2.X, strict, false);
-                    
-            }else
+            }
+            else
             {
                 // two non-parallel lines. Only one possible intersection point
 
