@@ -49,15 +49,6 @@ Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotatio
 Polygon2.Intersects(triangle, triangle, position1, position2, true); // False
 ```
 
-### Polygon AABB checking
-
-Note that this is only faster for fairly complicated polygons (theoretical breakeven at 6 unique normals each).
-Further note that it's almost *never* faster for rotated polygons - finding the AABB for rotated polygons is not
-supported (though not complicated).
-
-The provided AABB is most often used in UI elements which do not anticipate rotation and can have somewhat complicated
-polygons but don't have rotation, which is where AABBs shine.
-
 ```cs
 var complicatedShape = ShapeUtils.CreateCircle(5); // radius 5, 32 segments
 
@@ -88,6 +79,15 @@ if(mtv.HasValue)
   // Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotation2, false); -> True
 }
 ```
+
+### Polygon AABB checking
+
+Note that this is only faster for fairly complicated polygons (theoretical breakeven at 6 unique normals each).
+Further note that it's almost *never* faster for rotated polygons - finding the AABB for rotated polygons is not
+supported (though not complicated).
+
+The provided AABB is most often used in UI elements which do not anticipate rotation and can have somewhat complicated
+polygons but don't have rotation, which is where AABBs shine.
 
 ## Performance notes
 
