@@ -95,9 +95,9 @@ var triRot = new Rotation2((float)(Math.PI / 6));
 
 Vector2 tmp = Vector2.ZERO; // Vector2 is a struct so this is safe
 int xMin = (int)triPos.x;
-int xMax = (int)(Math.Ceiling(triPos.x) + triangle.LongestAxisLength);
+int xMax = (int)Math.Ceiling(triPos.x + triangle.LongestAxisLength);
 int yMin = (int)triPos.y;
-int yMax = (int)(Math.Ceiling(triPos.y) + triangle.LongestAxisLength);
+int yMax = (int)Math.Ceiling(triPos.y + triangle.LongestAxisLength);
 for(int y = yMin; y <= yMax; y++)
 {
   tmp.Y = y;
