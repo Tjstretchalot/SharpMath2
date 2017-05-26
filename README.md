@@ -19,7 +19,7 @@ using Microsoft.XNA.Framework;
 ```cs
 var triangle1 = new Polygon2(new[] { new Vector2(0, 0), new Vector2(1, 1), new Vector2(2, 0) });
 var triangle2 = ShapeUtils.CreateCircle(1, segments=3); // this is not the same triangle as triangle1, this will be equilateral
-var octogon = ShapeUtils.Createcircle(1, segments=8);
+var octogon = ShapeUtils.CreateCircle(1, segments=8);
 ```
 
 ### Polygon intersection
@@ -52,6 +52,11 @@ Polygon2.Intersects(triangle, triangle, position1, position2, true); // False
 ### Polygon AABB checking
 
 Note that this is only faster for fairly complicated polygons (theoretical breakeven at 6 unique normals each).
+Further note that it's almost *never* faster for rotated polygons - finding the AABB for rotated polygons is not
+supported (though not complicated).
+
+The provided AABB is most often used in UI elements which do not anticipate rotation and can have somewhat complicated
+polygons but don't have rotation, which is where AABBs shine.
 
 ```cs
 var complicatedShape = ShapeUtils.CreateCircle(5); // radius 5, 32 segments
