@@ -80,6 +80,41 @@ if(mtv.HasValue)
 }
 ```
 
+### Polygon -> AABB collision
+
+It is very common to need to check polygons against unrotated rectangles in square-grid systems. In this case 
+there are functions in Shape2 that provide these comparisons that is slightly faster than complete polygon to 
+polygon collision that you would get from `cs ShapeUtils.CreateRectangle` rather than `cs new Rect`
+
+```cs
+var triangle = ShapeUtils.CreateCircle(1, segments=3);
+var tile = new Rect2(0, 0, 1, 1); // minX, minY, maxX, maxY NOT x, y, w, h.
+
+var triPos = new Vector2(3.3, 4.1);
+var triRot = new Rotation2((float)(Math.PI / 6));
+
+Vector2 tmp = Vector2.ZERO; // Vector2 is a struct so this is safe
+int xMin = (int)triPos.x;
+int xMax = (int)(Math.Ceiling(triPos.x) + triangle.LongestAxisLength);
+int yMin = (int)triPos.y;
+int yMax = (int)(Math.Ceiling(triPos.y) + triangle.LongestAxisLength);
+for(int y = yMin; y <= yMax; y++)
+{
+  tmp.Y = y;
+  for(int x = xMin; x <= xMax; x++) 
+  {
+     tmp.X = x;
+     var intersectsTileAtXY = Shape2.Intersects(triangle, tile, triPos, tmp, triRot, true);
+     Console.Write($"({x},{y})={intersectsTileAtXY}")
+     if(intersectsTileAtXY)
+       Console.Write("  "); // true is 1 letter shorter than false
+     else
+       Console.WriteLine(" ");
+  }
+  Console.WriteLine();
+}
+```
+
 ### Polygon AABB checking
 
 Note that this is only faster for fairly complicated polygons (theoretical breakeven at 6 unique normals each).

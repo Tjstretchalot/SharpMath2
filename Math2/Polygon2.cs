@@ -35,6 +35,16 @@ namespace SharpMath2
 		public readonly Rect2 AABB;
 
         /// <summary>
+        /// The longest line that can be created inside this polygon. 
+        /// <example>
+        /// var poly = ShapeUtils.CreateRectangle(2, 3);
+        /// 
+        /// Console.WriteLine($"corner-to-corner = longest axis = Math.Sqrt(2 * 2 + 3 * 3) = {Math.Sqrt(2 * 2 + 3 * 3)} = {poly.LongestAxisLength}");
+        /// </example>
+        /// </summary>
+        public readonly float LongestAxisLength;
+
+        /// <summary>
         /// Initializes a polygon with the specified vertices
         /// </summary>
         /// <param name="vertices">Vertices</param>
@@ -75,6 +85,15 @@ namespace SharpMath2
                 Center += vert;
             }
             Center *= (1.0f / Vertices.Length);
+
+            float longestAxisLenSq = -1;
+            for(int i = 1; i < vertices.Length; i++)
+            {
+                var vec = vertices[i] - vertices[i - 1];
+                longestAxisLenSq = Math.Max(longestAxisLenSq, vec.LengthSquared());
+            }
+            longestAxisLenSq = Math.Max(longestAxisLenSq, (vertices[0] - vertices[vertices.Length - 1]).LengthSquared());
+            LongestAxisLength = (float)Math.Sqrt(longestAxisLenSq);
         }
         
         /// <summary>
