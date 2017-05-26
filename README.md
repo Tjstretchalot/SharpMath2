@@ -84,7 +84,7 @@ if(mtv.HasValue)
 
 It is very common to need to check polygons against unrotated rectangles in square-grid systems. In this case 
 there are functions in Shape2 that provide these comparisons that is slightly faster than complete polygon to 
-polygon collision that you would get from `ShapeUtils.CreateRectangle` rather than `new Rect(minx, miny, maxx, maxy)`
+polygon collision that you would get from `ShapeUtils.CreateRectangle(width, height)` rather than `new Rect(minx, miny, maxx, maxy)`
 
 ```cs
 var triangle = ShapeUtils.CreateCircle(1, segments=3);
@@ -109,7 +109,7 @@ for(int y = yMin; y <= yMax; y++)
      if(intersectsTileAtXY)
        Console.Write("  "); // true is 1 letter shorter than false
      else
-       Console.WriteLine(" ");
+       Console.Write(" ");
   }
   Console.WriteLine();
 }
