@@ -55,7 +55,7 @@ namespace SharpMath2
             }
 
             tmp = Math2.MakeStandardNormal(Vector2.Normalize(Math2.Perpendicular(vertices[0] - vertices[vertices.Length - 1])));
-            if (!Normals.Contains(tmp) && !Normals.Contains(-tmp))
+            if (!Normals.Contains(tmp))
                 Normals.Add(tmp);
 
 			var min = new Vector2(vertices[0].X, vertices[0].Y);
@@ -119,7 +119,7 @@ namespace SharpMath2
                 var mtv = IntersectMTVAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
                     return null;
-                else if (!bestAxis.HasValue || bestMagn.Value > mtv.Value)
+                else if (!bestAxis.HasValue || Math.Abs(mtv.Value) < Math.Abs(bestMagn.Value))
                 {
                     bestAxis = axis;
                     bestMagn = mtv;

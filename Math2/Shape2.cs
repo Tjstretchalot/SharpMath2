@@ -69,8 +69,8 @@ namespace SharpMath2
                 var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, norm);
                 if (!mtv.HasValue)
                     return null;
-
-                if(mtv.Value < bestMagn)
+                
+                if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = norm;
                     bestMagn = mtv.Value;
@@ -88,7 +88,7 @@ namespace SharpMath2
                 if (!mtv.HasValue)
                     return null;
                 
-                if(mtv.Value < bestMagn)
+                if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = Vector2.UnitX;
                     bestMagn = mtv.Value;
@@ -101,7 +101,7 @@ namespace SharpMath2
                 if (!mtv.HasValue)
                     return null;
 
-                if(mtv.Value < bestMagn)
+                if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = Vector2.UnitY;
                     bestMagn = mtv.Value;
