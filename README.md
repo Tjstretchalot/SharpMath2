@@ -59,13 +59,13 @@ Polygon2.Intersects(triangle, triangle, position1, position2, true); // False
 // note we do not check for intersection first - while intersection is faster to check than intersection + MTV, it is not 
 // faster to check intersection then intersection + MTV if you will need the MTV.
 
-// Note strict is not an option for MTV - if two triangles are touching but not overlappingit
+// Note strict is not an option for MTV - if two triangles are touching but not overlapping then
 // it doesn't make sense to try and get an MTV
-Vector2? mtv = Polygon2.IntersectMTV(triangle, triangle, position1, position2, rotation1, rotation2);
-if(mtv.HasValue)
+Tuple<Vector2, float> mtv = Polygon2.IntersectMTV(triangle, triangle, position1, position2, rotation1, rotation2);
+if(mtv != null)
 {
   // The two entites are colliding.
-  position1 += mtv.Value;
+  position1 += mtv.Item1 * mtv.Item2;
   
   // Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotation2, true); -> False
   // Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotation2, false); -> True
@@ -122,7 +122,7 @@ var complicatedShape = ShapeUtils.CreateCircle(5); // radius 5, 32 segments
 // Note we are not providing rotation - rect2 does not support rotation 
 // (use ShapeUtils.CreateRectangle for that, which returns a Polygon2)
 Rect2.Intersects(complicatedShape.AABB, complicatedShape.AABB, Vector2.ZERO, new Vector2(3, 0), true); // True
-```
+````
 
 ## Performance notes
 

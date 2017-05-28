@@ -27,7 +27,22 @@ namespace SharpMath2
         /// <returns>If v1, v2, v3 is collinear</returns>
         public static bool IsOnLine(Vector2 v1, Vector2 v2, Vector2 v3, float epsilon = DEFAULT_EPSILON)
         {
-            return Math.Abs(v1.X * (v2.Y - v3.Y) + v2.X * (v3.Y - v1.Y) + v3.X * (v1.Y - v2.Y)) <= epsilon;
+            return AreaOfTriangle(v1, v2, v3) <= epsilon;
+        }
+
+        /// <summary>
+        /// Calculates the square of the area of the triangle made up of the specified points.
+        /// </summary>
+        /// <param name="v1">First point</param>
+        /// <param name="v2">Second point</param>
+        /// <param name="v3">Third point</param>
+        /// <returns>Area of the triangle made up of the given 3 points</returns>
+        public static float AreaOfTriangle(Vector2 v1, Vector2 v2, Vector2 v3)
+        {
+            var v2Moved = v2 - v1;
+            var v3Moved = v3 - v1;
+
+            return 0.5f * (v2Moved.X * v3Moved.Y - v2Moved.Y * v3Moved.X);
         }
 
         /// <summary>

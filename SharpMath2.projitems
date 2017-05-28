@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Math2\AxisAlignedLine2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Circle2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math2\Line2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math2\Math2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math2\Polygon2.cs" />

@@ -20,6 +20,12 @@ namespace SharpMath2
         public readonly Vector2[] Vertices;
 
         /// <summary>
+        /// The lines of this polygon, such that any two adjacent (wrapping)
+        /// lines share a vertex
+        /// </summary>
+        public readonly Line2[] Lines;
+
+        /// <summary>
         /// The center of this polyogn
         /// </summary>
         public readonly Vector2 Center;
@@ -43,6 +49,11 @@ namespace SharpMath2
         /// </example>
         /// </summary>
         public readonly float LongestAxisLength;
+
+        /// <summary>
+        /// The area of this polygon
+        /// </summary>
+        public readonly float Area;
 
         /// <summary>
         /// Initializes a polygon with the specified vertices
@@ -94,6 +105,50 @@ namespace SharpMath2
             }
             longestAxisLenSq = Math.Max(longestAxisLenSq, (vertices[0] - vertices[vertices.Length - 1]).LengthSquared());
             LongestAxisLength = (float)Math.Sqrt(longestAxisLenSq);
+
+            // Area and lines
+            float area = 0;
+            Lines = new Line2[Vertices.Length];
+            var last = Vertices[Vertices.Length - 1];
+            for(int i = 0; i < Vertices.Length; i++)
+            {
+                var next = Vertices[i];
+                Lines[i] = new Line2(last, next);
+                last = next;
+
+                area += Math2.AreaOfTriangle(last, next, Center);
+            }
+            Area = area;
+        }
+
+        /// <summary>
+        /// Determines if the specified polygon at the specified position and rotation contains the specified point
+        /// </summary>
+        /// <param name="poly">The polygon</param>
+        /// <param name="pos">Origin of the polygon</param>
+        /// <param name="rot">Rotation of the polygon</param>
+        /// <param name="point">Point to check</param>
+        /// <param name="strict">True if the edges do not count as inside</param>
+        /// <returns>If the polygon at pos with rotation rot about its center contains point</returns>
+        public static bool Contains(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 point, bool strict)
+        {
+            if (!Rect2.Contains(poly.AABB, pos, point, strict))
+                return false;
+
+            // Calculate the area of the triangles constructed by the lines of the polygon. If it
+            // matches the area of the polygon, we're inside the polygon. 
+            float myArea = 0;
+
+            var center = poly.Center + pos;
+            var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
+            for(int i = 0; i < poly.Vertices.Length; i++)
+            {
+                var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+
+                myArea += Math2.AreaOfTriangle(center, last, curr);
+            }
+
+            return Math2.Approximately(myArea, poly.Area);
         }
 
         /// <summary>
