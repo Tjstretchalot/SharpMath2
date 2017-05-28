@@ -32,9 +32,9 @@ var octogon = ShapeUtils.CreateCircle(1, segments=8);
 var triangle = new Polygon2(new[] { new Vector2(0, 0), new Vector2(1, 1), new Vector2(2, 0) });
 
 // Rotation2 caches Math.Sin and Math.Cos of the given angle, so if you know you are going to reuse
-// rotations often (like 0) they should be cached (Rotation2.ZERO is provided)
-var rotation1 = Rotation2.ZERO;
-var rotation2 = Rotation2.ZERO; // new Rotation2((float)(Math.PI / 6)) would be 30degrees
+// rotations often (like 0) they should be cached (Rotation2.Zero is provided)
+var rotation1 = Rotation2.Zero;
+var rotation2 = Rotation2.Zero; // new Rotation2((float)(Math.PI / 6)) would be 30degrees
 var position1 = new Vector2(5, 3);
 var position2 = new Vector2(6, 3);
 
@@ -44,7 +44,7 @@ Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotatio
 // Determine if the polygons overlap
 Polygon2.Intersects(triangle, triangle, position1, position2, rotation1, rotation2, true); // False
 
-// Note that in the special case of no rotation (rotation1 == rotation2 == Rotation2.ZERO) we can
+// Note that in the special case of no rotation (rotation1 == rotation2 == Rotation2.Zero) we can
 // use the shorter function definition by omitting the rotation parameters
 Polygon2.Intersects(triangle, triangle, position1, position2, true); // False
 ```
@@ -85,7 +85,7 @@ var tile = new Rect2(0, 0, 1, 1); // minX, minY, maxX, maxY NOT x, y, w, h.
 var triPos = new Vector2(3.3, 4.1);
 var triRot = new Rotation2((float)(Math.PI / 6));
 
-Vector2 tmp = Vector2.ZERO; // Vector2 is a struct so this is safe
+Vector2 tmp = Vector2.Zero; // Vector2 is a struct so this is safe
 int xMin = (int)triPos.x;
 int xMax = (int)Math.Ceiling(triPos.x + triangle.LongestAxisLength);
 int yMin = (int)triPos.y;
@@ -121,8 +121,32 @@ var complicatedShape = ShapeUtils.CreateCircle(5); // radius 5, 32 segments
 
 // Note we are not providing rotation - rect2 does not support rotation 
 // (use ShapeUtils.CreateRectangle for that, which returns a Polygon2)
-Rect2.Intersects(complicatedShape.AABB, complicatedShape.AABB, Vector2.ZERO, new Vector2(3, 0), true); // True
+Rect2.Intersects(complicatedShape.AABB, complicatedShape.AABB, Vector2.Zero, new Vector2(3, 0), true); // True
 ````
+
+### Circles
+
+Circles have similiar functions to polygons. The only thing to note is that all API functions will use the top-left
+of the bounding box of the circle for the circles position, rather than the center of the circle. This makes switching
+things between circles and polygons easier in return for a very small performance cost.
+
+```cs
+var circle = new Circle2(3); // The only argument is the radius of the circle.
+var anotherCircle = new Circle2(5); 
+var triangle = ShapeUtils.CreateCircle(2, segments=3); 
+
+// Circle -> Circle collision using the same underlying circle object
+Circle2.Intersects(circle, circle, Vector2.Zero, new Vector(1, 0), true); // True
+
+// Circle -> Circle collision can be done using just the radius
+Circle2.Intersects(3.0f, 3.0f, Vector2.Zero, new Vector2(1, 0), true); // Identical to above
+
+// Circle -> Polygon collision must pass in a circle, not the radius of the circle
+Shape2.Intersects(circle, triangle, Vector2.Zero, new Vector2(1, 1), true); // True
+
+// Circle -> AABB collision
+Shape2.Intersects(circle, triangle.AABB, Vector2.Zero, new Vector2(10, 0), true); // False
+```
 
 ## Performance notes
 
