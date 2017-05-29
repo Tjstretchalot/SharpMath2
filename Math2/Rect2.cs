@@ -104,7 +104,7 @@ namespace SharpMath2
         /// <returns>The projection of rect at pos along axis</returns>
         public static AxisAlignedLine2 ProjectAlongAxis(Rect2 rect, Vector2 pos, Vector2 axis)
         {
-            return ProjectAlongAxis(axis, pos, Rotation2.Zero, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
+            return ProjectAlongAxis(axis, pos, Rotation2.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
         }
     }
 }

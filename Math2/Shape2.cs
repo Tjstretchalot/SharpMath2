@@ -399,7 +399,69 @@ namespace SharpMath2
         /// <returns>MTV for circle at pos1 to prevent overlap with rect at pos2</returns>
         public static Tuple<Vector2, float> IntersectMTV(Circle2 circle, Rect2 rect, Vector2 pos1, Vector2 pos2)
         {
-            return null;
+            // Same as polygon rect, just converted to rects points
+            HashSet<Vector2> checkedAxis = new HashSet<Vector2>();
+
+            Vector2 bestAxis = Vector2.Zero;
+            float shortestOverlap = float.MaxValue;
+
+            Func<Vector2, bool> checkAxis = (axis) =>
+            {
+                var standard = Math2.MakeStandardNormal(axis);
+                if (!checkedAxis.Contains(standard))
+                {
+                    checkedAxis.Add(standard);
+                    var circleProj = Circle2.ProjectAlongAxis(circle, pos1, axis);
+                    var rectProj = Rect2.ProjectAlongAxis(rect, pos2, axis);
+
+                    var mtv = AxisAlignedLine2.IntersectMTV(circleProj, rectProj);
+                    if (!mtv.HasValue)
+                        return false;
+
+                    if (Math.Abs(mtv.Value) < Math.Abs(shortestOverlap))
+                    {
+                        bestAxis = axis;
+                        shortestOverlap = mtv.Value;
+                    }
+                }
+                return true;
+            };
+
+            var circleCenter = new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius);
+            int last = 4;
+            var lastVec = rect.UpperRight + pos2;
+            for (int curr = 0; curr < 4; curr++)
+            {
+                Vector2 currVec = Vector2.Zero;
+                switch(curr)
+                {
+                    case 0:
+                        currVec = rect.Min + pos2;
+                        break;
+                    case 1:
+                        currVec = rect.LowerLeft + pos2;
+                        break;
+                    case 2:
+                        currVec = rect.Max + pos2;
+                        break;
+                    case 3:
+                        currVec = rect.UpperRight + pos2;
+                        break; 
+                }
+
+                // Test along circle center -> vector
+                if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
+                    return null;
+
+                // Test along line normal
+                if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(currVec - lastVec))))
+                    return null;
+
+                last = curr;
+                lastVec = currVec;
+            }
+
+            return Tuple.Create(bestAxis, shortestOverlap);
         }
 
         /// <summary>

@@ -65,6 +65,24 @@ namespace SharpMath2
         {
             return Radius.GetHashCode();
         }
+
+        /// <summary>
+        /// Determines if the circle at the specifiedp osition contains the point
+        /// </summary>
+        /// <param name="circle">The circle</param>
+        /// <param name="pos">The top-left of the circles bounding box</param>
+        /// <param name="point">The point to check if is in the circle at pos</param>
+        /// <param name="strict">If the edges do not count</param>
+        /// <returns>If the circle at pos contains point</returns>
+        public static bool Contains(Circle2 circle, Vector2 pos, Vector2 point, bool strict)
+        {
+            var distSq = (point - new Vector2(pos.X + circle.Radius, pos.Y + circle.Radius)).LengthSquared();
+
+            if (strict)
+                return distSq < circle.Radius * circle.Radius;
+            else
+                return distSq <= circle.Radius * circle.Radius;
+        }
         
         /// <summary>
         /// Determines if the first circle at the specified position intersects the second circle
