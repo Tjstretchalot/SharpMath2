@@ -249,7 +249,74 @@ namespace SharpMath2
         /// <returns></returns>
         public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly, Circle2 circle, Vector2 pos1, Vector2 pos2, Rotation2 rot1)
         {
-            return null;
+            // We have two situations, either the circle is not strictly intersecting the polygon, or
+            // there exists at least one shortest line that you could push the polygon to prevent 
+            // intersection with the circle.
+
+            // That line will either go from a vertix of the polygon to a point on the edge of the circle,
+            // or it will go from a point on a line of the polygon to the edge of the circle.
+
+            // If the line comes from a vertix of the polygon, the MTV will be along the line produced
+            // by going from the center of the circle to the vertix, and the distance can be found by
+            // projecting the cirle on that axis and the polygon on that axis and doing 1D overlap.
+
+            // If the line comes from a point on the edge of the polygon, the MTV will be along the
+            // normal of that line, and the distance can be found by projecting the circle on that axis
+            // and the polygon on that axis and doing 1D overlap.
+
+            // As with all SAT, if we find any axis that the circle and polygon do not overlap, we've
+            // proven they do not intersect.
+
+            // The worst case performance is related to 2x the number of vertices of the polygon, the same speed
+            // as for 2 polygons of equal number of vertices.
+
+            HashSet<Vector2> checkedAxis = new HashSet<Vector2>();
+
+            Vector2 bestAxis = Vector2.Zero;
+            float shortestOverlap = float.MaxValue;
+
+            Func<Vector2, bool> checkAxis = (axis) =>
+            {
+                var standard = Math2.MakeStandardNormal(axis);
+                if (!checkedAxis.Contains(standard))
+                {
+                    checkedAxis.Add(standard);
+                    var polyProj = Polygon2.ProjectAlongAxis(poly, pos1, rot1, axis);
+                    var circleProj = Circle2.ProjectAlongAxis(circle, pos2, axis);
+
+                    var mtv = AxisAlignedLine2.IntersectMTV(polyProj, circleProj);
+                    if (!mtv.HasValue)
+                        return false;
+
+                    if (Math.Abs(mtv.Value) < Math.Abs(shortestOverlap))
+                    {
+                        bestAxis = axis;
+                        shortestOverlap = mtv.Value;
+                    }
+                }
+                return true;
+            };
+
+            var circleCenter = new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius);
+            int last = poly.Vertices.Length - 1;
+            var lastVec = Math2.Rotate(poly.Vertices[last], poly.Center, rot1) + pos1;
+            for(int curr = 0; curr < poly.Vertices.Length; curr++)
+            {
+                var currVec = Math2.Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
+
+                // Test along circle center -> vector
+                if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
+                    return null;
+
+                // Test along line normal
+                if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(currVec - lastVec))))
+                    return null;
+
+                last = curr;
+                lastVec = currVec;
+            }
+
+            return Tuple.Create(bestAxis, shortestOverlap);
         }
 
         /// <summary>

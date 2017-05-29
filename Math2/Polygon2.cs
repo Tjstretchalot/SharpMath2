@@ -15,7 +15,8 @@ namespace SharpMath2
     public class Polygon2 : Shape2
     {
         /// <summary>
-        /// The vertices of this polygon, in order
+        /// The vertices of this polygon, such that any two adjacent vertices
+        /// create a line of the polygon
         /// </summary>
         public readonly Vector2[] Vertices;
 
@@ -64,6 +65,7 @@ namespace SharpMath2
         {
             if (vertices == null)
                 throw new ArgumentNullException(nameof(vertices));
+            
             Vertices = vertices;
 
             Normals = new List<Vector2>();
@@ -96,7 +98,8 @@ namespace SharpMath2
                 Center += vert;
             }
             Center *= (1.0f / Vertices.Length);
-
+            
+            // Find longest axis
             float longestAxisLenSq = -1;
             for (int i = 1; i < vertices.Length; i++)
             {
