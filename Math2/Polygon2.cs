@@ -188,7 +188,7 @@ namespace SharpMath2
         /// <param name="pos2">Position of the second polygon</param>
         /// <param name="rot1">Rotation of the first polyogn</param>
         /// <param name="rot2">Rotation of the second polygon</param>
-        /// <returns>MTV to m</returns>
+        /// <returns>MTV to move poly1 to prevent intersection with poly2</returns>
         public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
         {
             Vector2 bestAxis = Vector2.Zero;
