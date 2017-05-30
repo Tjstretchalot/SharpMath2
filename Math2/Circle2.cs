@@ -67,7 +67,7 @@ namespace SharpMath2
         }
 
         /// <summary>
-        /// Determines if the circle at the specifiedp osition contains the point
+        /// Determines if the circle at the specified position contains the point
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="pos">The top-left of the circles bounding box</param>

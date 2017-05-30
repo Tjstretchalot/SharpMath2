@@ -155,15 +155,17 @@ namespace SharpMath2
         }
 
         /// <summary>
-        /// Determines if the first polygon intersects the second polygon when polygon one
-        /// is at position 1 and polygon two is at position two.
+        /// Determines if the first polygon intersects the second polygon when they are at
+        /// the respective positions and rotations.
         /// </summary>
-        /// <param name="poly1">polygon one</param>
-        /// <param name="poly2">polygon two</param>
-        /// <param name="pos1">Position one</param>
-        /// <param name="pos2">Position two</param>
+        /// <param name="poly1">First polygon</param>
+        /// <param name="poly2">Second polygon</param>
+        /// <param name="pos1">Position of the first polygon</param>
+        /// <param name="pos2">Position of the second polygon</param>
+        /// <param name="rot1">Rotation of the first polygon</param>
+        /// <param name="rot2">Rotation fo the second polyogn</param>
         /// <param name="strict">If overlapping is required for intersection</param>
-        /// <returns>If poly1 at pos1 intersects poly2 at pos2</returns>
+        /// <returns>If poly1 at pos1 with rotation rot1 intersects poly2 at pos2with rotation rot2</returns>
         public static bool Intersects(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, bool strict)
         {
             foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
@@ -180,15 +182,17 @@ namespace SharpMath2
         /// Determines the mtv to move pos1 by to prevent poly1 at pos1 from intersecting poly2 at pos2.
         /// Returns null if poly1 and poly2 do not intersect.
         /// </summary>
-        /// <param name="poly1">polygon 1</param>
-        /// <param name="poly2">polygon 2</param>
-        /// <param name="pos1">polygon 1 origin</param>
-        /// <param name="pos2">polygon 2 origin</param>
-        /// <returns>MTV for polygon 1</returns>
-        public static Vector2? IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
+        /// <param name="poly1">First polygon</param>
+        /// <param name="poly2">Second polygon</param>
+        /// <param name="pos1">Position of the first polygon</param>
+        /// <param name="pos2">Position of the second polygon</param>
+        /// <param name="rot1">Rotation of the first polyogn</param>
+        /// <param name="rot2">Rotation of the second polygon</param>
+        /// <returns>MTV to m</returns>
+        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
         {
-            Vector2? bestAxis = null;
-            float? bestMagn = null;
+            Vector2 bestAxis = Vector2.Zero;
+            float bestMagn = float.MaxValue;
 
             foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
             {
@@ -196,14 +200,14 @@ namespace SharpMath2
                 var mtv = IntersectMTVAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
                     return null;
-                else if (!bestAxis.HasValue || Math.Abs(mtv.Value) < Math.Abs(bestMagn.Value))
+                else if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = axis;
-                    bestMagn = mtv;
+                    bestMagn = mtv.Value;
                 }
             }
 
-            return bestAxis.Value * bestMagn.Value;
+            return Tuple.Create(bestAxis, bestMagn);
         }
 
         /// <summary>
@@ -352,7 +356,7 @@ namespace SharpMath2
         /// <param name="pos1">Origin of first polygon</param>
         /// <param name="pos2">Origin of second polygon</param>
         /// <returns>If poly1 at pos1 not rotated intersects poly2 at pos2 not rotated</returns>
-        public static Vector2? IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMTV(poly1, poly2, pos1, pos2, Rotation2.Zero, Rotation2.Zero);
         }
