@@ -25,8 +25,8 @@ namespace SharpMath2
 #if !NOT_MONOGAME
         public Rect2 ToRect(Rectangle original) {
 			return new Rect2(
-					new Vector2(original.Left * Min.X, original.Top * Min.Y),
-					new Vector2(original.Right * Max.X, original.Bottom * Max.Y)
+				new Vector2(original.Left + original.Width * Min.X, original.Top  + original.Height * Min.Y),
+					new Vector2(original.Left + original.Width * Max.X, original.Top + original.Height * Max.Y)
 			);
 		}
 #endif
