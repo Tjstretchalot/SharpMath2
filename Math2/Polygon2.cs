@@ -117,9 +117,8 @@ namespace SharpMath2
             {
                 var next = Vertices[i];
                 Lines[i] = new Line2(last, next);
-                last = next;
-
                 area += Math2.AreaOfTriangle(last, next, Center);
+                last = next;
             }
             Area = area;
         }
@@ -149,6 +148,8 @@ namespace SharpMath2
                 var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
 
                 myArea += Math2.AreaOfTriangle(center, last, curr);
+
+                last = curr;
             }
 
             return Math2.Approximately(myArea, poly.Area);

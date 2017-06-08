@@ -39,10 +39,7 @@ namespace SharpMath2
         /// <returns>Area of the triangle made up of the given 3 points</returns>
         public static float AreaOfTriangle(Vector2 v1, Vector2 v2, Vector2 v3)
         {
-            var v2Moved = v2 - v1;
-            var v3Moved = v3 - v1;
-
-            return 0.5f * (v2Moved.X * v3Moved.Y - v2Moved.Y * v3Moved.X);
+            return 0.5f * ((v2.X - v1.X) * (v3.Y - v1.Y) - (v3.X - v1.X) * (v2.Y - v1.Y));
         }
 
         /// <summary>
