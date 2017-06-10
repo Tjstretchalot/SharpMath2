@@ -152,7 +152,7 @@ namespace SharpMath2
                 last = curr;
             }
 
-            return Math2.Approximately(myArea, poly.Area);
+            return Math2.Approximately(myArea, poly.Area, poly.Area / 1000);
         }
 
         /// <summary>
@@ -275,25 +275,33 @@ namespace SharpMath2
         /// <param name="pt">Point to check.</param>
         public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 pt)
         {
+            if (Contains(poly, pos, rot, pt, false))
+                return null;
+
             float? res = null;
             Vector2 axis = Vector2.Zero;
-            foreach (var normUnrot in poly.Normals)
+            foreach (var vert in poly.Vertices)
             {
-                var norm = Math2.Rotate(normUnrot, Vector2.Zero, rot);
+                var vertRot = Math2.Rotate(vert, poly.Center, rot) + pos;
+                var norm = Vector2.Normalize(pt - vertRot);
                 var proj = ProjectAlongAxis(poly, pos, rot, norm);
-                var ptProj = Vector2.Dot(pos, norm);
+                var ptProj = Vector2.Dot(pt, norm);
 
                 var distTo = AxisAlignedLine2.MinDistance(proj, ptProj);
                 if (!distTo.HasValue)
-                    return null;
+                    continue;
 
-                if (!res.HasValue || distTo.Value < res.Value)
+                if (!res.HasValue || distTo.Value > res.Value)
                 {
                     res = distTo;
                     axis = norm;
                 }
             }
 
+            if(!res.HasValue)
+            {
+                MinDistance(poly, pos, rot, pt);
+            }
             return Tuple.Create(axis, res.Value);
         }
 
@@ -310,23 +318,38 @@ namespace SharpMath2
         /// <param name="rot2">Rotation of second polygon</param>
         public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
         {
+            if (Intersects(poly1, poly2, pos1, pos2, rot1, rot2, false))
+                return null;
+
             float? res = null;
             Vector2 axis = Vector2.Zero;
 
-            foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
+            var polyPolyNorms = new HashSet<Vector2>();
+            foreach(var vert in poly1.Vertices)
             {
-                var newAxis = Math2.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
-                var proj1 = ProjectAlongAxis(poly1, pos1, rot1, newAxis);
-                var proj2 = ProjectAlongAxis(poly2, pos2, rot2, newAxis);
+                var vertRot = Math2.Rotate(vert, poly1.Center, rot1) + pos1;
+
+                foreach(var vert2 in poly2.Vertices)
+                {
+                    var vert2Rot = Math2.Rotate(vert2, poly2.Center, rot2) + pos2;
+
+                    polyPolyNorms.Add(Math2.MakeStandardNormal(Vector2.Normalize(vert2Rot - vertRot)));
+                }
+            }
+
+            foreach (var norm in polyPolyNorms)
+            {
+                var proj1 = ProjectAlongAxis(poly1, pos1, rot1, norm);
+                var proj2 = ProjectAlongAxis(poly2, pos2, rot2, norm);
 
                 var distTo = AxisAlignedLine2.MinDistance(proj1, proj2);
                 if (!distTo.HasValue)
-                    return null;
+                    continue;
 
-                if (!res.HasValue || distTo.Value < res.Value)
+                if (!res.HasValue || distTo.Value > res.Value)
                 {
                     res = distTo;
-                    axis = newAxis;
+                    axis = norm;
                 }
             }
 
