@@ -57,6 +57,11 @@ namespace SharpMath2
         public readonly float Area;
 
         /// <summary>
+        /// If this polygon is defined clockwise
+        /// </summary>
+        public readonly bool Clockwise;
+
+        /// <summary>
         /// Initializes a polygon with the specified vertices
         /// </summary>
         /// <param name="vertices">Vertices</param>
@@ -121,6 +126,38 @@ namespace SharpMath2
                 last = next;
             }
             Area = area;
+
+            last = Vertices[Vertices.Length - 1];
+            var centToLast = (last - Center);
+            var angLast = Math.Atan2(centToLast.Y, centToLast.X);
+            var cwCounter = 0;
+            var ccwCounter = 0;
+            var foundDefinitiveResult = false;
+            for (int i = 0; i < Vertices.Length; i++)
+            {
+                var curr = Vertices[i];
+                var centToCurr = (curr - Center);
+                var angCurr = Math.Atan2(centToCurr.Y, centToCurr.X);
+
+                var clockwise = angCurr < angLast;
+                if (clockwise)
+                    cwCounter++;
+                else
+                    ccwCounter++;
+                
+                Clockwise = clockwise;
+                if(Math.Abs(angLast - angCurr) > Math2.DEFAULT_EPSILON)
+                {
+                    foundDefinitiveResult = true;
+                    break;
+                }
+
+                last = curr;
+                centToLast = centToCurr;
+                angLast = angCurr;
+            }
+            if (!foundDefinitiveResult)
+                Clockwise = cwCounter > ccwCounter;
         }
 
         /// <summary>
@@ -266,7 +303,7 @@ namespace SharpMath2
         /// Calculates the shortest distance from the specified polygon to the specified point,
         /// and the axis from polygon to pos.
         /// 
-        /// Returns null if pt is contained in the polygon.
+        /// Returns null if pt is contained in the polygon (not strictly).
         /// </summary>
         /// <returns>The distance form poly to pt.</returns>
         /// <param name="poly">The polygon</param>
@@ -275,38 +312,76 @@ namespace SharpMath2
         /// <param name="pt">Point to check.</param>
         public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 pt)
         {
-            if (Contains(poly, pos, rot, pt, false))
-                return null;
+            /*
+             * Definitions
+             * 
+             * For each line in the polygon, find the normal of the line in the direction of outside the polygon.
+             * Call the side of the original line that contains none of the polygon "above the line". The other side is "below the line".
+             * 
+             * If the point falls above the line:
+             *   Imagine two additional lines that are normal to the line and fall on the start and end, respectively.
+             *   For each of those two lines, call the side of the line that contains the original line "below the line". The other side is "above the line"
+             *   
+             *   If the point is above the line containing the start:
+             *     The shortest vector is from the start to the point
+             *   
+             *   If the point is above the line containing the end:
+             *     The shortest vector is from the end to the point
+             *     
+             *   Otherwise
+             *     The shortest vector is from the line to the point
+             * 
+             * If this is not true for ANY of the lines, the polygon does not contain the point.
+             */
 
-            float? res = null;
-            Vector2 axis = Vector2.Zero;
-            foreach (var vert in poly.Vertices)
+            var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
+            for(var i = 0; i < poly.Vertices.Length; i++)
             {
-                var vertRot = Math2.Rotate(vert, poly.Center, rot) + pos;
-                var norm = Vector2.Normalize(pt - vertRot);
-                var proj = ProjectAlongAxis(poly, pos, rot, norm);
-                var ptProj = Vector2.Dot(pt, norm);
+                var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+                var axis = curr - last;
+                Vector2 norm;
+                if (poly.Clockwise)
+                    norm = new Vector2(-axis.Y, axis.X);
+                else
+                    norm = new Vector2(axis.Y, -axis.X);
+                norm = Vector2.Normalize(norm);
+                axis = Vector2.Normalize(axis);
 
-                var distTo = AxisAlignedLine2.MinDistance(proj, ptProj);
-                if (!distTo.HasValue)
-                    continue;
-
-                if (!res.HasValue || distTo.Value > res.Value)
+                var lineProjOnNorm = Vector2.Dot(norm, last);
+                var ptProjOnNorm = Vector2.Dot(norm, pt);
+                
+                if(ptProjOnNorm > lineProjOnNorm)
                 {
-                    res = distTo;
-                    axis = norm;
+                    var ptProjOnAxis = Vector2.Dot(axis, pt);
+                    var stProjOnAxis = Vector2.Dot(axis, last);
+                    
+                    if(ptProjOnAxis < stProjOnAxis)
+                    {
+                        var res = pt - last;
+                        return Tuple.Create(Vector2.Normalize(res), res.Length());
+                    }
+
+                    var enProjOnAxis = Vector2.Dot(axis, curr);
+
+                    if(ptProjOnAxis > enProjOnAxis)
+                    {
+                        var res = pt - curr;
+                        return Tuple.Create(Vector2.Normalize(res), res.Length());
+                    }
+
+
+                    var distOnNorm = ptProjOnNorm - lineProjOnNorm;
+                    return Tuple.Create(norm, distOnNorm);
                 }
+
+                last = curr;
             }
 
-            if(!res.HasValue)
-            {
-                MinDistance(poly, pos, rot, pt);
-            }
-            return Tuple.Create(axis, res.Value);
+            return null;
         }
 
         /// <summary>
-        /// Calculates the shortest distance and direction to go from pos1 to pos2. Returns null
+        /// Calculates the shortest distance and direction to go from poly1 at pos1 to poly2 at pos2. Returns null
         /// if the polygons intersect.
         /// </summary>
         /// <returns>The distance.</returns>

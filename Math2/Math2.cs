@@ -100,6 +100,8 @@ namespace SharpMath2
         /// <returns>The vector vec rotated about about rotation.Theta radians.</returns>
         public static Vector2 Rotate(Vector2 vec, Vector2 about, Rotation2 rotation)
         {
+            if (rotation.Theta == 0)
+                return vec;
             var tmp = vec - about;
             return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta + about.X,
                                tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta + about.Y);
