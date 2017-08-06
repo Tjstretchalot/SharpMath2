@@ -393,43 +393,53 @@ namespace SharpMath2
         /// <param name="rot2">Rotation of second polygon</param>
         public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
         {
-            if (Intersects(poly1, poly2, pos1, pos2, rot1, rot2, false))
-                return null;
+			if(rot1.Theta != 0 || rot2.Theta != 0) {
+				throw new NotSupportedException("Finding the minimum distance between polygons requires calculating the rotated polygons. This operation is expensive and should be cached. " +
+												"Create the rotated polygons with Polygon2#GetRotated and call this function with Rotation2.Zero for both rotations.");
+			}
 
-            float? res = null;
-            Vector2 axis = Vector2.Zero;
+			var normals = poly1.Normals.Union(poly2.Normals);
+			Vector2? bestAxis = null; // note this is the one with the longest distance
+			float bestDist = 0;
+			foreach(var norm in normals) {
+				var proj1 = ProjectAlongAxis(poly1, pos1, rot1, norm);
+				var proj2 = ProjectAlongAxis(poly2, pos2, rot2, norm);
 
-            var polyPolyNorms = new HashSet<Vector2>();
-            foreach(var vert in poly1.Vertices)
-            {
-                var vertRot = Math2.Rotate(vert, poly1.Center, rot1) + pos1;
+				var dist = AxisAlignedLine2.MinDistance(proj1, proj2);
+				if(dist.HasValue && (bestAxis == null || dist.Value > bestDist)) {
+					bestDist = dist.Value;
+					bestAxis = norm;
+				}
+			}
 
-                foreach(var vert2 in poly2.Vertices)
-                {
-                    var vert2Rot = Math2.Rotate(vert2, poly2.Center, rot2) + pos2;
+			if (!bestAxis.HasValue)
+				return null; // they intersect
 
-                    polyPolyNorms.Add(Math2.MakeStandardNormal(Vector2.Normalize(vert2Rot - vertRot)));
-                }
-            }
-
-            foreach (var norm in polyPolyNorms)
-            {
-                var proj1 = ProjectAlongAxis(poly1, pos1, rot1, norm);
-                var proj2 = ProjectAlongAxis(poly2, pos2, rot2, norm);
-
-                var distTo = AxisAlignedLine2.MinDistance(proj1, proj2);
-                if (!distTo.HasValue)
-                    continue;
-
-                if (!res.HasValue || distTo.Value > res.Value)
-                {
-                    res = distTo;
-                    axis = norm;
-                }
-            }
-
-            return Tuple.Create(axis, res.Value);
+			return Tuple.Create(bestAxis.Value, bestDist);
         }
+
+		/// <summary>
+		/// Returns a polygon that is created by rotated the original polygon
+		/// about its center by the specified amount. Returns the original polygon
+		/// rot.Theta == 0.
+		/// </summary>
+		/// <returns>The rotated polygon.</returns>
+		/// <param name="original">Original.</param>
+		/// <param name="rot">Rot.</param>
+		public static Polygon2 GetRotated(Polygon2 original, Rotation2 rot)
+		{
+			if (rot.Theta == 0)
+				return original;
+
+			var rotatedVerts = new Vector2[original.Vertices.Length];
+			for (var i = 0; i < original.Vertices.Length; i++)
+			{
+				rotatedVerts[i] = Math2.Rotate(original.Vertices[i], original.Center, rot);
+			}
+
+			return new Polygon2(rotatedVerts);
+		}
+
 
         #region NoRotation
         /// <summary>
