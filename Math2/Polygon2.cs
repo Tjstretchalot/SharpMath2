@@ -70,7 +70,7 @@ namespace SharpMath2
         {
             if (vertices == null)
                 throw new ArgumentNullException(nameof(vertices));
-            
+
             Vertices = vertices;
 
             Normals = new List<Vector2>();
@@ -103,7 +103,7 @@ namespace SharpMath2
                 Center += vert;
             }
             Center *= (1.0f / Vertices.Length);
-            
+
             // Find longest axis
             float longestAxisLenSq = -1;
             for (int i = 1; i < vertices.Length; i++)
@@ -118,7 +118,7 @@ namespace SharpMath2
             float area = 0;
             Lines = new Line2[Vertices.Length];
             var last = Vertices[Vertices.Length - 1];
-            for(int i = 0; i < Vertices.Length; i++)
+            for (int i = 0; i < Vertices.Length; i++)
             {
                 var next = Vertices[i];
                 Lines[i] = new Line2(last, next);
@@ -144,9 +144,9 @@ namespace SharpMath2
                     cwCounter++;
                 else
                     ccwCounter++;
-                
+
                 Clockwise = clockwise;
-                if(Math.Abs(angLast - angCurr) > Math2.DEFAULT_EPSILON)
+                if (Math.Abs(angLast - angCurr) > Math2.DEFAULT_EPSILON)
                 {
                     foundDefinitiveResult = true;
                     break;
@@ -180,7 +180,7 @@ namespace SharpMath2
 
             var center = poly.Center + pos;
             var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
-            for(int i = 0; i < poly.Vertices.Length; i++)
+            for (int i = 0; i < poly.Vertices.Length; i++)
             {
                 var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
 
@@ -238,7 +238,7 @@ namespace SharpMath2
                 var mtv = IntersectMTVAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
                     return null;
-                else if(Math.Abs(mtv.Value) < Math.Abs(bestMagn))
+                else if (Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = axis;
                     bestMagn = mtv.Value;
@@ -335,7 +335,7 @@ namespace SharpMath2
              */
 
             var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
-            for(var i = 0; i < poly.Vertices.Length; i++)
+            for (var i = 0; i < poly.Vertices.Length; i++)
             {
                 var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
                 var axis = curr - last;
@@ -349,13 +349,13 @@ namespace SharpMath2
 
                 var lineProjOnNorm = Vector2.Dot(norm, last);
                 var ptProjOnNorm = Vector2.Dot(norm, pt);
-                
-                if(ptProjOnNorm > lineProjOnNorm)
+
+                if (ptProjOnNorm > lineProjOnNorm)
                 {
                     var ptProjOnAxis = Vector2.Dot(axis, pt);
                     var stProjOnAxis = Vector2.Dot(axis, last);
-                    
-                    if(ptProjOnAxis < stProjOnAxis)
+
+                    if (ptProjOnAxis < stProjOnAxis)
                     {
                         var res = pt - last;
                         return Tuple.Create(Vector2.Normalize(res), res.Length());
@@ -363,7 +363,7 @@ namespace SharpMath2
 
                     var enProjOnAxis = Vector2.Dot(axis, curr);
 
-                    if(ptProjOnAxis > enProjOnAxis)
+                    if (ptProjOnAxis > enProjOnAxis)
                     {
                         var res = pt - curr;
                         return Tuple.Create(Vector2.Normalize(res), res.Length());
@@ -380,6 +380,19 @@ namespace SharpMath2
             return null;
         }
 
+        private static IEnumerable<Vector2> GetExtraMinDistanceVecsPolyPoly(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
+        {
+            foreach (var vert in poly1.Vertices)
+            {
+                foreach (var vert2 in poly2.Vertices)
+                {
+                    var roughAxis = ((vert2 + pos2) - (vert + pos1));
+                    roughAxis.Normalize();
+                    yield return Math2.MakeStandardNormal(roughAxis);
+                }
+            }
+        }
+
         /// <summary>
         /// Calculates the shortest distance and direction to go from poly1 at pos1 to poly2 at pos2. Returns null
         /// if the polygons intersect.
@@ -393,52 +406,58 @@ namespace SharpMath2
         /// <param name="rot2">Rotation of second polygon</param>
         public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
         {
-			if(rot1.Theta != 0 || rot2.Theta != 0) {
-				throw new NotSupportedException("Finding the minimum distance between polygons requires calculating the rotated polygons. This operation is expensive and should be cached. " +
-												"Create the rotated polygons with Polygon2#GetRotated and call this function with Rotation2.Zero for both rotations.");
-			}
+            if (rot1.Theta != 0 || rot2.Theta != 0)
+            {
+                throw new NotSupportedException("Finding the minimum distance between polygons requires calculating the rotated polygons. This operation is expensive and should be cached. " +
+                                                "Create the rotated polygons with Polygon2#GetRotated and call this function with Rotation2.Zero for both rotations.");
+            }
 
-			var normals = poly1.Normals.Union(poly2.Normals);
-			Vector2? bestAxis = null; // note this is the one with the longest distance
-			float bestDist = 0;
-			foreach(var norm in normals) {
-				var proj1 = ProjectAlongAxis(poly1, pos1, rot1, norm);
-				var proj2 = ProjectAlongAxis(poly2, pos2, rot2, norm);
+            var axises = poly1.Normals.Union(poly2.Normals).Union(GetExtraMinDistanceVecsPolyPoly(poly1, poly2, pos1, pos2));
+            Vector2? bestAxis = null; // note this is the one with the longest distance
+            float bestDist = 0;
+            foreach (var norm in axises)
+            {
+                var proj1 = ProjectAlongAxis(poly1, pos1, rot1, norm);
+                var proj2 = ProjectAlongAxis(poly2, pos2, rot2, norm);
 
-				var dist = AxisAlignedLine2.MinDistance(proj1, proj2);
-				if(dist.HasValue && (bestAxis == null || dist.Value > bestDist)) {
-					bestDist = dist.Value;
-					bestAxis = norm;
-				}
-			}
+                var dist = AxisAlignedLine2.MinDistance(proj1, proj2);
+                if (dist.HasValue && (bestAxis == null || dist.Value > bestDist))
+                {
+                    bestDist = dist.Value;
+                    if (proj2.Min < proj1.Min && dist > 0)
+                        bestAxis = -norm;
+                    else
+                        bestAxis = norm;
+                }
+            }
 
-			if (!bestAxis.HasValue)
-				return null; // they intersect
+            if (!bestAxis.HasValue)
+                return null; // they intersect
 
-			return Tuple.Create(bestAxis.Value, bestDist);
+            return Tuple.Create(bestAxis.Value, bestDist);
         }
 
-		/// <summary>
-		/// Returns a polygon that is created by rotated the original polygon
-		/// about its center by the specified amount. Returns the original polygon
-		/// rot.Theta == 0.
-		/// </summary>
-		/// <returns>The rotated polygon.</returns>
-		/// <param name="original">Original.</param>
-		/// <param name="rot">Rot.</param>
-		public static Polygon2 GetRotated(Polygon2 original, Rotation2 rot)
-		{
-			if (rot.Theta == 0)
-				return original;
+        /// <summary>
+        /// Returns a polygon that is created by rotated the original polygon
+        /// about its center by the specified amount. Returns the original polygon
+        /// rot.Theta == 0.
+        /// </summary>
+        /// <returns>The rotated polygon.</returns>
+        /// <param name="original">Original.</param>
+        /// <param name="rot">Rot.</param>
+        public static Polygon2 GetRotated(Polygon2 original, Rotation2 rot)
+        {
+            if (rot.Theta == 0)
+                return original;
 
-			var rotatedVerts = new Vector2[original.Vertices.Length];
-			for (var i = 0; i < original.Vertices.Length; i++)
-			{
-				rotatedVerts[i] = Math2.Rotate(original.Vertices[i], original.Center, rot);
-			}
+            var rotatedVerts = new Vector2[original.Vertices.Length];
+            for (var i = 0; i < original.Vertices.Length; i++)
+            {
+                rotatedVerts[i] = Math2.Rotate(original.Vertices[i], original.Center, rot);
+            }
 
-			return new Polygon2(rotatedVerts);
-		}
+            return new Polygon2(rotatedVerts);
+        }
 
 
         #region NoRotation
