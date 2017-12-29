@@ -47,9 +47,6 @@ namespace SharpMath2
                 if (data[j * Texture.Width + i] != 0)
                     Points.Add(new Vector2(i, j));
 
-            if (Points == null)
-                return null;
-
             if (Points.Count <= 2)
                 throw new Exception("Can not create a convex hull from a line.");
 
