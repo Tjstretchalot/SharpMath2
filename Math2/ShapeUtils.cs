@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace SharpMath2
 {
     /// <summary>
-    /// A simple shape utils class.
+    /// A class containing utilities that help creating shapes.
     /// </summary>
     public class ShapeUtils
     {
@@ -27,9 +27,9 @@ namespace SharpMath2
         private static Dictionary<int, Polygon2> ConvexPolygonCache = new Dictionary<int, Polygon2>();
 
         /// <summary>
-        /// Creates a convex polygon from the given texture.
+        /// Fetches the convex polygon (the smallest possible polygon containing all the non-transparent pixels) of the given texture.
         /// </summary>
-        /// <param name="Texture"></param>
+        /// <param name="Texture">The texture.</param>
         public static Polygon2 CreateConvexPolygon(Texture2D Texture)
         {
             var Key = Texture.GetHashCode();
@@ -37,41 +37,46 @@ namespace SharpMath2
             if (ConvexPolygonCache.ContainsKey(Key))
                 return ConvexPolygonCache[Key];
 
-            var data = new uint[Texture.Width * Texture.Height];
-            Texture.GetData<uint>(data);
+            var uints = new uint[Texture.Width * Texture.Height];
+            Texture.GetData<uint>(uints);
 
             var Points = new List<Vector2>();
 
             for (var i = 0; i < Texture.Width; i++)
             for (var j = 0; j < Texture.Height; j++)
-                if (data[j * Texture.Width + i] != 0)
+                if (uints[j * Texture.Width + i] != 0)
                     Points.Add(new Vector2(i, j));
 
             if (Points.Count <= 2)
                 throw new Exception("Can not create a convex hull from a line.");
 
             int n = Points.Count, k = 0;
-            List<Vector2> H = new List<Vector2>(new Vector2[2 * n]);
+            var h = new List<Vector2>(
+                new Vector2[2 * n]
+            );
 
-            Points.Sort((a, b) => a.X == b.X ? a.Y.CompareTo(b.Y) : (a.X > b.X ? 1 : -1));
+            Points.Sort(
+                (a, b) => 
+                a.X == b.X ?
+                     a.Y.CompareTo(b.Y)
+                : (a.X > b.X ? 1 : -1)
+             );
 
-            for (int i = 0; i < n; ++i)
+            for (var i = 0; i < n; ++i)
             {
-                while (k >= 2 && cross(H[k - 2], H[k - 1], Points[i]) <= 0)
+                while (k >= 2 && cross(h[k - 2], h[k - 1], Points[i]) <= 0)
                     k--;
-                H[k++] = Points[i];
+                h[k++] = Points[i];
             }
 
             for (int i = n - 2, t = k + 1; i >= 0; i--)
             {
-                while (k >= t && cross(H[k - 2], H[k - 1], Points[i]) <= 0)
+                while (k >= t && cross(h[k - 2], h[k - 1], Points[i]) <= 0)
                     k--;
-                H[k++] = Points[i];
+                h[k++] = Points[i];
             }
 
-            Points = H.Take(k - 1).ToList();
-
-
+            Points = h.Take(k - 1).ToList();
             return ConvexPolygonCache[Key] = new Polygon2(Points.ToArray());
         }
         /// <summary>
@@ -86,9 +91,8 @@ namespace SharpMath2
             return (v2.X - v1.X) * (v3.Y - v1.Y) - (v2.Y - v1.Y) * (v3.X - v1.X);
         }
 
-
         /// <summary>
-        /// Creates a new rectangle shape with the given width, height, x and y center.
+        /// Fetches a rectangle shape with the given width, height, x and y center.
         /// </summary>
         /// <param name="width">The width of the rectangle.</param>
         /// <param name="height">The height of the rectangle.</param>
@@ -111,7 +115,7 @@ namespace SharpMath2
         }
 
         /// <summary>
-        /// Creates a new circle shape with the given radius, center, and segments.
+        /// Fetches a circle shape with the given radius, center, and segments.
         /// </summary>
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="x">The X center of the circle.</param>
