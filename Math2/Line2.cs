@@ -110,8 +110,8 @@ namespace SharpMath2
             MinY = Math.Min(Start.Y, End.Y);
             MaxX = Math.Max(Start.X, End.X);
             MaxY = Math.Max(Start.X, End.X);
-            Horizontal = Math.Abs(End.X - Start.X) <= Math2.DEFAULT_EPSILON;
-            Vertical = Math.Abs(End.Y - Start.Y) <= Math2.DEFAULT_EPSILON;
+            Horizontal = Math.Abs(End.Y - Start.Y) <= Math2.DEFAULT_EPSILON;
+            Vertical = Math.Abs(End.X - Start.X) <= Math2.DEFAULT_EPSILON;
 
             if (Vertical)
                 Slope = float.PositiveInfinity;
