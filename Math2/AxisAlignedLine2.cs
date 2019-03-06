@@ -14,12 +14,23 @@ namespace SharpMath2
     /// </summary>
     public class AxisAlignedLine2
     {
+        /// <summary>
+        /// The axis that this projected line is on. Optional.
+        /// </summary>
         public readonly Vector2 Axis;
+
+        /// <summary>
+        /// The minimum of this line
+        /// </summary>
         public readonly float Min;
+
+        /// <summary>
+        /// The maximum of this line
+        /// </summary>
         public readonly float Max;
 
         /// <summary>
-        /// Initializes an an axis aligned line. Will autocorrect if min > max
+        /// Initializes an an axis aligned line. Will autocorrect if min &gt; max
         /// </summary>
         /// <param name="axis">The axis</param>
         /// <param name="min">The min</param>
@@ -82,6 +93,7 @@ namespace SharpMath2
         /// <param name="min2">Min 2</param>
         /// <param name="max2">Max 2</param>
         /// <param name="strict">If overlap is required for intersection</param>
+        /// <param name="correctMinMax">If true (default true) mins and maxes will be swapped if in the wrong order</param>
         /// <returns>If (min1, max1) intersects (min2, max2)</returns>
         public static bool Intersects(float min1, float max1, float min2, float max2, bool strict, bool correctMinMax = true)
         {
@@ -142,6 +154,7 @@ namespace SharpMath2
         /// <param name="max">Max of line</param>
         /// <param name="point">Point to check</param>
         /// <param name="strict">If edges are excluded</param>
+        /// <param name="correctMinMax">if true (default true) min and max will be swapped if in the wrong order</param>
         /// <returns>if line (min, max) contains point</returns>
         public static bool Contains(float min, float max, float point, bool strict, bool correctMinMax = true)
         {
@@ -250,7 +263,10 @@ namespace SharpMath2
             return null;
         }
 
-
+        /// <summary>
+        /// Creates a human-readable representation of this line
+        /// </summary>
+        /// <returns>string representation of this vector</returns>
         public override string ToString()
         {
             return $"[{Min} -> {Max} along {Axis}]";

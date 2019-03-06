@@ -221,6 +221,10 @@ namespace SharpMath2
             }
         }
 
+        /// <summary>
+        /// Create a human-readable representation of this line
+        /// </summary>
+        /// <returns>human-readable string</returns>
         public override string ToString()
         {
             return $"[{Start} to {End}]";

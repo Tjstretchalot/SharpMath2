@@ -12,12 +12,43 @@ namespace SharpMath2
     /// </summary>
     public class Rect2 : Shape2
     {
+        /// <summary>
+        /// The corner with the smallest x and y coordinates on this
+        /// rectangle.
+        /// </summary>
         public readonly Vector2 Min;
+
+        /// <summary>
+        /// The corner with the largest x and y coordinates on this
+        /// rectangle
+        /// </summary>
         public readonly Vector2 Max;
+
+        /// <summary>
+        /// The corner with the largest x and smallest y coordinates on
+        /// this rectangle
+        /// </summary>
         public readonly Vector2 UpperRight;
+
+        /// <summary>
+        /// The corner with the smallest x and largest y coordinates on this
+        /// rectangle
+        /// </summary>
         public readonly Vector2 LowerLeft;
+
+        /// <summary>
+        /// The center of this rectangle
+        /// </summary>
         public readonly Vector2 Center;
+
+        /// <summary>
+        /// The width of this rectangle
+        /// </summary>
         public readonly float Width;
+
+        /// <summary>
+        /// The height of this rectangle
+        /// </summary>
         public readonly float Height;
 
         /// <summary>
