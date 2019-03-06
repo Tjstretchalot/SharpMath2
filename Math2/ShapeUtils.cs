@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SharpMath2
 {
     /// <summary>
     /// Contains a collection of functions that generate particular shapes
     /// </summary>
+    public class ShapeUtils
     public class ShapeUtils
     {
         /// <summary>
@@ -20,7 +23,12 @@ namespace SharpMath2
         /// <returns>the polygon that looks like a rectangle</returns>
         public static Polygon2 CreateRectangle(float width, float height, float x = 0, float y = 0)
         {
-            return new Polygon2(new Vector2[] {
+            var Key = new Tuple<float, float, float, float>(width, height, x, y);
+
+            if (RectangleCache.ContainsKey(Key))
+                return RectangleCache[Key];
+
+            return RectangleCache[Key] = new Polygon2(new [] {
                  new Vector2(x, y),
                  new Vector2(x + width, y),
                  new Vector2(x + width, y + height),
@@ -38,20 +46,28 @@ namespace SharpMath2
         /// <returns>The polygon approximating the specified circle</returns>
         public static Polygon2 CreateCircle(float radius, float x = 0, float y = 0, int segments = 32)
         {
-            Vector2 center = new Vector2(radius + x, radius + y);
+            var Key = new Tuple<float, float, float, float>(radius, x, y, segments);
 
-            double increment = Math.PI * 2.0 / segments;
-            double theta = 0.0;
+            if (CircleCache.ContainsKey(Key))
+                return CircleCache[Key];
 
+            var Center = new Vector2(radius + x, radius + y);
+            var increment = (Math.PI * 2.0) / segments;
+            var theta = 0.0;
             var verts = new List<Vector2>(segments);
-            for (int i = 0; i < segments; i++)
+
+            for (var i = 0; i < segments; i++)
             {
-                Vector2 v = center + radius * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta));
-                verts.Add(v);
+                verts.Add(
+                    Center + radius * new Vector2(
+                        (float) Math.Cos(theta),
+                        (float) Math.Sin(theta)
+                    )
+                );
                 theta += increment;
             }
 
-            return new Polygon2(verts.ToArray());
+            return CircleCache[Key] = new Polygon2(verts.ToArray());
         }
     }
 }
