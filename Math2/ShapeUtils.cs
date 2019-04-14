@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+
+#if !NOT_MONOGAME
 using Microsoft.Xna.Framework.Graphics;
+#endif
 
 namespace SharpMath2
 {
@@ -26,6 +29,7 @@ namespace SharpMath2
         /// </summary>
         private static Dictionary<int, Polygon2> ConvexPolygonCache = new Dictionary<int, Polygon2>();
 
+#if !NOT_MONOGAME
         /// <summary>
         /// Fetches the convex polygon (the smallest possible polygon containing all the non-transparent pixels) of the given texture.
         /// </summary>
@@ -79,6 +83,8 @@ namespace SharpMath2
             Points = h.Take(k - 1).ToList();
             return ConvexPolygonCache[Key] = new Polygon2(Points.ToArray());
         }
+#endif
+
         /// <summary>
         /// Returns the cross product of the given three vectors.
         /// </summary>
@@ -115,7 +121,9 @@ namespace SharpMath2
         }
 
         /// <summary>
-        /// Fetches a circle shape with the given radius, center, and segments.
+        /// Fetches a circle shape with the given radius, center, and segments. Because of the discretization
+        /// of the circle, it is not possible to perfectly get the AABB to match both the radius and the position.
+        /// This will match the position.
         /// </summary>
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="x">The X center of the circle.</param>
@@ -134,15 +142,31 @@ namespace SharpMath2
             var theta = 0.0;
             var verts = new List<Vector2>(segments);
 
+            Vector2 correction = new Vector2(radius, radius);
             for (var i = 0; i < segments; i++)
             {
-                verts.Add(
-                    Center + radius * new Vector2(
+                Vector2 vert = radius * new Vector2(
                         (float)Math.Cos(theta),
                         (float)Math.Sin(theta)
-                    )
+                    );
+
+                if (vert.X < correction.X)
+                    correction.X = vert.X;
+                if (vert.Y < correction.Y)
+                    correction.Y = vert.Y;
+
+                verts.Add(
+                    Center + vert
                 );
                 theta += increment;
+            }
+
+            correction.X += radius;
+            correction.Y += radius;
+
+            for(var i = 0; i < segments; i++)
+            {
+                verts[i] -= correction;
             }
 
             return CircleCache[Key] = new Polygon2(verts.ToArray());

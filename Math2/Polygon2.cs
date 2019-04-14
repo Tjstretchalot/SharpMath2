@@ -461,6 +461,68 @@ namespace SharpMath2
         }
 
 
+        /// <summary>
+        /// Creates the ray trace polygons from the given polygon moving from start to end. The returned set of polygons
+        /// may not be the smallest possible set of polygons which perform this job. 
+        /// 
+        /// In order to determine if polygon A intersects polygon B during a move from position S to E, you can check if
+        /// B intersects any of the polygons in CreateRaytraceAblesFromPolygon(A, E - S) when they are placed at S.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// Polygon2 a = ShapeUtils.CreateCircle(10, 0, 0, 5);
+        /// Polygon2 b = ShapeUtils.CreateCircle(15, 0, 0, 7);
+        /// 
+        /// Vector2 from = new Vector2(3, 3);
+        /// Vector2 to = new Vector2(15, 3);
+        /// Vector2 bloc = new Vector2(6, 3);
+        /// 
+        /// List<Polygon2> traces = Polygon2.CreateRaytraceAbles(a, to - from);
+        /// foreach (var trace in traces)
+        /// {
+        ///     if (Polygon2.Intersects(trace, b, from, bloc, true))
+        ///     {
+        ///         Console.WriteLine("Intersects!");
+        ///         break;
+        ///     }
+        /// }
+        /// </code>
+        /// </example>
+        /// <param name="poly">The polygon that you want to move</param>
+        /// <param name="offset">The direction and magnitude that the polygon moves</param>
+        /// <returns>A set of polygons which completely contain the area that the polygon will intersect during a move
+        /// from the origin to offset.</returns>
+        public static List<Polygon2> CreateRaytraceAbles(Polygon2 poly, Vector2 offset)
+        {
+            var ourLinesAsRects = new List<Polygon2>();
+            if (Math2.Approximately(offset, Vector2.Zero))
+            {
+                ourLinesAsRects.Add(poly);
+                return ourLinesAsRects;
+            }
+
+            Vector2 unitDir = new Vector2(offset.X, offset.Y);
+            unitDir.Normalize();
+            Vector2 unitDirStandardized = Math2.MakeStandardNormal(unitDir);
+
+            for (int lineIndex = 0, nLines = poly.Lines.Length; lineIndex < nLines; lineIndex++)
+            {
+                var line = poly.Lines[lineIndex];
+                if (!Math2.Approximately(Math2.MakeStandardNormal(line.Axis), unitDirStandardized))
+                {
+                    ourLinesAsRects.Add(new Polygon2(new Vector2[]
+                    {
+                    line.Start,
+                    line.End,
+                    line.End + offset,
+                    line.Start + offset
+                    }));
+                }
+            }
+
+            return ourLinesAsRects;
+        }
+
         #region NoRotation
         /// <summary>
         /// Determines if the specified polygons intersect when at the specified positions and not rotated.
