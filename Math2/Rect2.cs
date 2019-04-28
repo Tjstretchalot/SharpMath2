@@ -127,6 +127,34 @@ namespace SharpMath2
         }
 
         /// <summary>
+        /// Determines if innerBox is contained entirely in outerBox
+        /// </summary>
+        /// <param name="outerBox">the (bigger) box that you want to check contains the inner box</param>
+        /// <param name="innerBox">the (smaller) box that you want to check is contained in the outer box</param>
+        /// <param name="posOuter">where the outer box is located</param>
+        /// <param name="posInner">where the inner box is located</param>
+        /// <param name="strict">true to return false if innerBox touches an edge of outerBox, false otherwise</param>
+        /// <returns>true if innerBox is contained in outerBox, false otherwise</returns>
+        public static bool Contains(Rect2 outerBox, Rect2 innerBox, Vector2 posOuter, Vector2 posInner, bool strict)
+        {
+            return Contains(outerBox, posOuter, innerBox.Min + posInner, strict) && Contains(outerBox, posOuter, innerBox.Max + posInner, strict);
+        }
+
+        /// <summary>
+        /// Deterimines in the box contains the specified polygon
+        /// </summary>
+        /// <param name="box">The box</param>
+        /// <param name="poly">The polygon</param>
+        /// <param name="boxPos">Where the box is located</param>
+        /// <param name="polyPos">Where the polygon is located</param>
+        /// <param name="strict">true if we return false if the any part of the polygon is on the edge, false otherwise</param>
+        /// <returns>true if the poly is contained in box, false otherwise</returns>
+        public static bool Contains(Rect2 box, Polygon2 poly, Vector2 boxPos, Vector2 polyPos, bool strict)
+        {
+            return Contains(box, poly.AABB, boxPos, polyPos, strict);
+        }
+
+        /// <summary>
         /// Projects the rectangle at pos along axis.
         /// </summary>
         /// <param name="rect">The rectangle to project</param>
