@@ -206,6 +206,24 @@ namespace SharpMath2
         /// <returns>If poly1 at pos1 with rotation rot1 intersects poly2 at pos2with rotation rot2</returns>
         public static bool Intersects(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, bool strict)
         {
+            if (rot1 == Rotation2.Zero && rot2 == Rotation2.Zero)
+            {
+                // This was a serious performance bottleneck so we speed up the fast case
+                for (int i = 0, len = poly1.Normals.Count; i < len; i++)
+                {
+                    var axis = poly1.Normals[i];
+                    if (!IntersectsAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, strict, axis))
+                        return false;
+                }
+                for (int i = 0, len = poly2.Normals.Count; i < len; i++)
+                {
+                    var axis = poly2.Normals[i];
+                    if (!IntersectsAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, strict, axis))
+                        return false;
+                }
+                return true;
+            }
+
             foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
             {
                 var axis = Math2.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
@@ -508,7 +526,9 @@ namespace SharpMath2
             for (int lineIndex = 0, nLines = poly.Lines.Length; lineIndex < nLines; lineIndex++)
             {
                 var line = poly.Lines[lineIndex];
-                if (!Math2.Approximately(Math2.MakeStandardNormal(line.Axis), unitDirStandardized))
+                if (!Math2.Approximately(Math2.MakeStandardNormal(line.Axis), unitDirStandardized)
+                    && !Math2.Approximately(line.Start.X, line.End.X + offset.X)
+                    && !Math2.Approximately(line.Start.Y, line.End.Y + offset.Y))
                 {
                     ourLinesAsRects.Add(new Polygon2(new Vector2[]
                     {
