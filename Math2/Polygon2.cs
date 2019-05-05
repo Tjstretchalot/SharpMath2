@@ -209,16 +209,27 @@ namespace SharpMath2
             if (rot1 == Rotation2.Zero && rot2 == Rotation2.Zero)
             {
                 // This was a serious performance bottleneck so we speed up the fast case
+                HashSet<Vector2> seen = new HashSet<Vector2>();
+                Vector2[] poly1Verts = poly1.Vertices;
+                Vector2[] poly2Verts = poly2.Vertices;
                 for (int i = 0, len = poly1.Normals.Count; i < len; i++)
                 {
                     var axis = poly1.Normals[i];
-                    if (!IntersectsAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, strict, axis))
+                    var proj1 = ProjectAlongAxis(axis, pos1, poly1Verts);
+                    var proj2 = ProjectAlongAxis(axis, pos2, poly2Verts);
+                    if (!AxisAlignedLine2.Intersects(proj1, proj2, strict))
                         return false;
+                    seen.Add(axis);
                 }
                 for (int i = 0, len = poly2.Normals.Count; i < len; i++)
                 {
                     var axis = poly2.Normals[i];
-                    if (!IntersectsAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, strict, axis))
+                    if (seen.Contains(axis))
+                        continue;
+
+                    var proj1 = ProjectAlongAxis(axis, pos1, poly1Verts);
+                    var proj2 = ProjectAlongAxis(axis, pos2, poly2Verts);
+                    if (!AxisAlignedLine2.Intersects(proj1, proj2, strict))
                         return false;
                 }
                 return true;

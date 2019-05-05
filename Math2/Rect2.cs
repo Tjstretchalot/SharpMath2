@@ -13,28 +13,33 @@ namespace SharpMath2
     public class Rect2 : Shape2
     {
         /// <summary>
+        /// The vertices of this rectangle as a clockwise array.
+        /// </summary>
+        public readonly Vector2[] Vertices;
+
+        /// <summary>
         /// The corner with the smallest x and y coordinates on this
         /// rectangle.
         /// </summary>
-        public readonly Vector2 Min;
+        public Vector2 Min => Vertices[0];
 
         /// <summary>
         /// The corner with the largest x and y coordinates on this
         /// rectangle
         /// </summary>
-        public readonly Vector2 Max;
+        public Vector2 Max => Vertices[2];
 
         /// <summary>
         /// The corner with the largest x and smallest y coordinates on
         /// this rectangle
         /// </summary>
-        public readonly Vector2 UpperRight;
+        public Vector2 UpperRight => Vertices[1];
 
         /// <summary>
         /// The corner with the smallest x and largest y coordinates on this
         /// rectangle
         /// </summary>
-        public readonly Vector2 LowerLeft;
+        public Vector2 LowerLeft => Vertices[3];
 
         /// <summary>
         /// The center of this rectangle
@@ -75,10 +80,10 @@ namespace SharpMath2
             max.X = Math.Max(tmpX1, tmpX2);
             max.Y = Math.Max(tmpY1, tmpY2);
 
-            Min = min;
-            Max = max;
-            UpperRight = new Vector2(Max.X, Min.Y);
-            LowerLeft = new Vector2(Min.X, Max.Y);
+            Vertices = new Vector2[]
+            {
+                min, new Vector2(max.X, min.Y), max, new Vector2(min.X, max.Y)
+            };
 
             Center = new Vector2((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2);
 
@@ -163,7 +168,8 @@ namespace SharpMath2
         /// <returns>The projection of rect at pos along axis</returns>
         public static AxisAlignedLine2 ProjectAlongAxis(Rect2 rect, Vector2 pos, Vector2 axis)
         {
-            return ProjectAlongAxis(axis, pos, Rotation2.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
+            //return ProjectAlongAxis(axis, pos, Rotation2.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
+            return ProjectAlongAxis(axis, pos, rect.Vertices);
         }
     }
 }

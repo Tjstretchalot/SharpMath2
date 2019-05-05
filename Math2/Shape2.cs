@@ -492,6 +492,9 @@ namespace SharpMath2
         /// <returns>Projection of polygon of points at pos along axis</returns>
         protected static AxisAlignedLine2 ProjectAlongAxis(Vector2 axis, Vector2 pos, Rotation2 rot, Vector2 center, params Vector2[] points)
         {
+            if (rot == Rotation2.Zero)
+                return ProjectAlongAxis(axis, pos, points);
+
             float min = 0;
             float max = 0;
 
@@ -508,6 +511,39 @@ namespace SharpMath2
                 {
                     min = Math.Min(min, tmp);
                     max = Math.Max(max, tmp);
+                }
+            }
+
+            return new AxisAlignedLine2(axis, min, max);
+        }
+
+        /// <summary>
+        /// A faster variant of ProjectAlongAxis that assumes no rotation.
+        /// </summary>
+        /// <param name="axis">The axis that the points are being projected along</param>
+        /// <param name="pos">The offset for the points</param>
+        /// <param name="points">The points in the convex polygon</param>
+        /// <returns>The projectino of the polygon comprised of points at pos along axis</returns>
+        protected unsafe static AxisAlignedLine2 ProjectAlongAxis(Vector2 axis, Vector2 pos, Vector2[] points)
+        {
+            int len = points.Length;
+            if (len == 0)
+                return new AxisAlignedLine2(axis, 0, 0);
+
+            float min;
+            float max;
+            fixed(Vector2* pt = points)
+            { 
+                min = axis.X * (pt[0].X + pos.X) + axis.Y * (pt[0].Y + pos.Y);
+                max = min;
+                for (int i = 1; i < len; i++)
+                {
+                    float tmp = axis.X * (pt[i].X + pos.X) + axis.Y * (pt[i].Y + pos.Y);
+
+                    if (tmp < min)
+                        min = tmp;
+                    if (tmp > max)
+                        max = tmp;
                 }
             }
 
