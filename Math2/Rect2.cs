@@ -65,12 +65,9 @@ namespace SharpMath2
         /// <exception cref="ArgumentException">If min and max do not make a box</exception>
         public Rect2(Vector2 min, Vector2 max)
         {
-            if (Math2.Approximately(min, max))
-                throw new ArgumentException($"Min is approximately max: min={min}, max={max} - tha'ts a point, not a box");
-            if (Math.Abs(min.X - max.X) <= Math2.DEFAULT_EPSILON)
-                throw new ArgumentException($"Min x is approximately max x: min={min}, max={max} - that's a line, not a box");
-            if (Math.Abs(min.Y - max.Y) <= Math2.DEFAULT_EPSILON)
-                throw new ArgumentException($"Min y is approximately max y: min={min}, max={max} - that's a line, not a box");
+            float area = (max.X - min.X) * (max.Y - min.Y);
+            if(area > -Math2.DEFAULT_EPSILON && area < Math2.DEFAULT_EPSILON)
+                throw new ArgumentException($"min={min}, max={max} - that's a line or a point, not a box (area below epsilon {Math2.DEFAULT_EPSILON} (got {area}))");
 
             float tmpX1 = min.X, tmpX2 = max.X;
             float tmpY1 = min.Y, tmpY2 = max.Y;

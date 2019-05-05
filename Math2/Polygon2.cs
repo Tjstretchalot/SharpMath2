@@ -530,16 +530,10 @@ namespace SharpMath2
                 return ourLinesAsRects;
             }
 
-            Vector2 unitDir = new Vector2(offset.X, offset.Y);
-            unitDir.Normalize();
-            Vector2 unitDirStandardized = Math2.MakeStandardNormal(unitDir);
-
             for (int lineIndex = 0, nLines = poly.Lines.Length; lineIndex < nLines; lineIndex++)
             {
                 var line = poly.Lines[lineIndex];
-                if (!Math2.Approximately(Math2.MakeStandardNormal(line.Axis), unitDirStandardized)
-                    && !Math2.Approximately(line.Start.X, line.End.X + offset.X)
-                    && !Math2.Approximately(line.Start.Y, line.End.Y + offset.Y))
+                if (!Math2.IsOnLine(line.Start, line.End, line.Start + offset))
                 {
                     ourLinesAsRects.Add(new Polygon2(new Vector2[]
                     {
