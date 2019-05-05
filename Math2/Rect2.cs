@@ -66,7 +66,7 @@ namespace SharpMath2
         public Rect2(Vector2 min, Vector2 max)
         {
             if (Math2.Approximately(min, max))
-                throw new ArgumentException($"Min is approximately max: min={min}, max={max} - tha'ts a point, not a box");
+                throw new ArgumentException($"Min is approximately max: min={min}, max={max} - that's a point, not a box");
             if (Math.Abs(min.X - max.X) <= Math2.DEFAULT_EPSILON)
                 throw new ArgumentException($"Min x is approximately max x: min={min}, max={max} - that's a line, not a box");
             if (Math.Abs(min.Y - max.Y) <= Math2.DEFAULT_EPSILON)
