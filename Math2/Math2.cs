@@ -118,10 +118,10 @@ namespace SharpMath2
         /// <returns>Normal such that vec.X is positive (unless vec.X is 0, in which such that vec.Y is positive)</returns>
         public static Vector2 MakeStandardNormal(Vector2 vec)
         {
-            if (vec.X < 0)
+            if (vec.X < -DEFAULT_EPSILON)
                 return -vec;
 
-            if (vec.X == 0 && vec.Y < 0)
+            if (Approximately(vec.X, 0) && vec.Y < 0)
                 return -vec;
 
             return vec;
