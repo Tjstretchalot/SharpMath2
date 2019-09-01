@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Math2\Shape2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math2\ShapeUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math2\RelativeRectangle2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math2\Triangle2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Microsoft\Xna\Framework\Vector2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Microsoft\Xna\Framework\Point.cs" />
   </ItemGroup>

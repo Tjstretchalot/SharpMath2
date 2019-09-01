@@ -32,6 +32,12 @@ namespace SharpMath2
         public readonly Vector2 Center;
 
         /// <summary>
+        /// This convex polygon partitioned into triangles, sorted by the area
+        /// of the triangles in descending order
+        /// </summary>
+        public readonly Triangle2[] TrianglePartition;
+
+        /// <summary>
         /// The three normal vectors of this polygon, normalized
         /// </summary>
         public readonly List<Vector2> Normals;
@@ -97,13 +103,6 @@ namespace SharpMath2
             }
             AABB = new Rect2(min, max);
 
-            Center = new Vector2(0, 0);
-            foreach (var vert in Vertices)
-            {
-                Center += vert;
-            }
-            Center *= (1.0f / Vertices.Length);
-
             // Find longest axis
             float longestAxisLenSq = -1;
             for (int i = 1; i < vertices.Length; i++)
@@ -114,18 +113,32 @@ namespace SharpMath2
             longestAxisLenSq = Math.Max(longestAxisLenSq, (vertices[0] - vertices[vertices.Length - 1]).LengthSquared());
             LongestAxisLength = (float)Math.Sqrt(longestAxisLenSq);
 
-            // Area and lines
+            // Center, area, and lines
+            TrianglePartition = new Triangle2[Vertices.Length - 2];
+            float[] triangleSortKeys = new float[TrianglePartition.Length];
             float area = 0;
             Lines = new Line2[Vertices.Length];
-            var last = Vertices[Vertices.Length - 1];
-            for (int i = 0; i < Vertices.Length; i++)
+            Lines[0] = new Line2(Vertices[Vertices.Length - 1], Vertices[0]);
+            var last = Vertices[0];
+            Center = new Vector2(0, 0);
+            for (int i = 1; i < Vertices.Length - 1; i++)
             {
                 var next = Vertices[i];
+                var next2 = Vertices[i + 1];
                 Lines[i] = new Line2(last, next);
-                area += Math2.AreaOfTriangle(last, next, Center);
+                var tri = new Triangle2(new Vector2[] { Vertices[0], next, next2 });
+                TrianglePartition[i - 1] = tri;
+                triangleSortKeys[i - 1] = -tri.Area;
+                area += tri.Area;
+                Center += tri.Center * tri.Area;
                 last = next;
             }
+            Lines[Vertices.Length - 1] = new Line2(Vertices[Vertices.Length - 2], Vertices[Vertices.Length - 1]);
+
+            Array.Sort(triangleSortKeys, TrianglePartition);
+
             Area = area;
+            Center /= area;
 
             last = Vertices[Vertices.Length - 1];
             var centToLast = (last - Center);
@@ -171,25 +184,22 @@ namespace SharpMath2
         /// <returns>If the polygon at pos with rotation rot about its center contains point</returns>
         public static bool Contains(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 point, bool strict)
         {
-            if (!Rect2.Contains(poly.AABB, pos, point, strict))
-                return false;
+            // The point is contained in the polygon iff it is contained in one of the triangles
+            // which partition this polygon. Due to how we constructed the triangles, it will
+            // be on the edge of the polygon if its on the first 2 edges of the triangle.
 
-            // Calculate the area of the triangles constructed by the lines of the polygon. If it
-            // matches the area of the polygon, we're inside the polygon. 
-            float myArea = 0;
-
-            var center = poly.Center + pos;
-            var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
-            for (int i = 0; i < poly.Vertices.Length; i++)
+            for (int i = 0, len = poly.TrianglePartition.Length; i < len; i++)
             {
-                var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+                var tri = poly.TrianglePartition[i];
 
-                myArea += Math2.AreaOfTriangle(center, last, curr);
-
-                last = curr;
+                if (Triangle2.Contains(tri, pos, point))
+                {
+                    if (strict && (Line2.Contains(tri.Edges[0], pos, point) || Line2.Contains(tri.Edges[1], pos, point)))
+                        return false;
+                    return true;
+                }
             }
-
-            return Math2.Approximately(myArea, poly.Area, poly.Area / 1000);
+            return false;
         }
 
         /// <summary>

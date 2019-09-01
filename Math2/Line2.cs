@@ -222,6 +222,31 @@ namespace SharpMath2
         }
 
         /// <summary>
+        /// Determines if the given line contains the given point.
+        /// </summary>
+        /// <param name="line">The line to check</param>
+        /// <param name="pos">The offset for the line</param>
+        /// <param name="pt">The point to check</param>
+        /// <returns>True if pt is on the line, flase otherwise</returns>
+        public static bool Contains(Line2 line, Vector2 pos, Vector2 pt)
+        {
+            if(line.Horizontal)
+            {
+                return Math2.Approximately(line.Start.Y + pos.Y, pt.Y)
+                    && AxisAlignedLine2.Contains(line.MinX, line.MaxX, pt.X - pos.X, false, false);
+            }
+            if(line.Vertical)
+            {
+                return Math2.Approximately(line.Start.X + pos.X, pt.X)
+                    && AxisAlignedLine2.Contains(line.MinY, line.MaxY, pt.Y - pos.Y, false, false);
+            }
+
+            var toDot = pt - pos - line.Start;
+
+            return Math2.Approximately(toDot.X * line.Normal.X + toDot.Y * line.Normal.Y, 0);
+        }
+
+        /// <summary>
         /// Create a human-readable representation of this line
         /// </summary>
         /// <returns>human-readable string</returns>
