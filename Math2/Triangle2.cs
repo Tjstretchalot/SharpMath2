@@ -92,7 +92,7 @@ namespace SharpMath2
         /// is along an edge of this polygon</returns>
         public static bool Contains(Triangle2 tri, Vector2 pos, Vector2 pt)
         {
-            Vector2 relPt = pt - pos;
+            Vector2 relPt = pt - pos - tri.Vertices[0];
             float r = tri.InvContainsBasis[0] * relPt.X + tri.InvContainsBasis[1] * relPt.Y;
             if (r < -Math2.DEFAULT_EPSILON)
                 return false;

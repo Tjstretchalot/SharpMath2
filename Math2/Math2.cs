@@ -69,6 +69,16 @@ namespace SharpMath2
             return x1 * x2 + y1 * y2;
         }
 
+        public static float Dot(Vector2 v1, Vector2 v2)
+        {
+            return Dot(v1.X, v1.Y, v2.X, v2.Y);
+        }
+
+        public static float Dot(Vector2 v, float x2, float y2)
+        {
+            return Dot(v.X, v.Y, x2, y2);
+        }
+
         /// <summary>
         /// Determines if f1 and f2 are approximately the same.
         /// </summary>
