@@ -47,6 +47,8 @@ namespace SharpMath2
         /// </summary>
         public readonly Rect2 AABB;
 
+        private float _LongestAxisLength;
+
         /// <summary>
         /// The longest line that can be created inside this polygon. 
         /// <example>
@@ -55,7 +57,30 @@ namespace SharpMath2
         /// Console.WriteLine($"corner-to-corner = longest axis = Math.Sqrt(2 * 2 + 3 * 3) = {Math.Sqrt(2 * 2 + 3 * 3)} = {poly.LongestAxisLength}");
         /// </example>
         /// </summary>
-        public readonly float LongestAxisLength;
+        public float LongestAxisLength
+        {
+            get
+            {
+                if(_LongestAxisLength < 0)
+                {
+                    Vector2[] verts = Vertices;
+                    float longestAxisLenSq = -1;
+                    for (int i = 1, len = verts.Length; i < len; i++)
+                    {
+                        for (int j = 0; j < i; j++)
+                        {
+                            var vec = vertices[i] - vertices[j];
+                            var vecLenSq = vec.LengthSquared();
+                            if (vecLenSq > longestAxisLenSq)
+                                longestAxisLenSq = vecLenSq;
+                        }
+                    }
+                    _LongestAxisLength = (float)Math.Sqrt(longestAxisLenSq);
+                }
+
+                return _LongestAxisLength;
+            }
+        }
 
         /// <summary>
         /// The area of this polygon
@@ -103,15 +128,7 @@ namespace SharpMath2
             }
             AABB = new Rect2(min, max);
 
-            // Find longest axis
-            float longestAxisLenSq = -1;
-            for (int i = 1; i < vertices.Length; i++)
-            {
-                var vec = vertices[i] - vertices[i - 1];
-                longestAxisLenSq = Math.Max(longestAxisLenSq, vec.LengthSquared());
-            }
-            longestAxisLenSq = Math.Max(longestAxisLenSq, (vertices[0] - vertices[vertices.Length - 1]).LengthSquared());
-            LongestAxisLength = (float)Math.Sqrt(longestAxisLenSq);
+            _LongestAxisLength = -1;
 
             // Center, area, and lines
             TrianglePartition = new Triangle2[Vertices.Length - 2];
