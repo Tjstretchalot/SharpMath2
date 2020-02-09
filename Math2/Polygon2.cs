@@ -69,7 +69,7 @@ namespace SharpMath2
                     {
                         for (int j = 0; j < i; j++)
                         {
-                            var vec = vertices[i] - vertices[j];
+                            var vec = verts[i] - verts[j];
                             var vecLenSq = vec.LengthSquared();
                             if (vecLenSq > longestAxisLenSq)
                                 longestAxisLenSq = vecLenSq;
