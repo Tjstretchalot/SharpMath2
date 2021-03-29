@@ -64,7 +64,7 @@ namespace SharpMath2
             float d = vertices[2].Y - vertices[0].Y;
 
             float det = a * d - b * c;
-            Area = 0.5f * det;
+            Area = Math.Abs(0.5f * det);
 
             float invDet = 1 / det;
             InvContainsBasis = new float[4]

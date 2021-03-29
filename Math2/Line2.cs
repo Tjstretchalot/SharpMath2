@@ -448,6 +448,37 @@ namespace SharpMath2
         }
 
         /// <summary>
+        /// Calculates the distance that the given point is from this line.
+        /// Will be nearly 0 if the point is on the line.
+        /// </summary>
+        /// <param name="line">The line</param>
+        /// <param name="pos">The shift for the line</param>
+        /// <param name="pt">The point that you want the distance from the line</param>
+        /// <returns>The distance the point is from the line</returns>
+        public static float Distance(Line2 line, Vector2 pos, Vector2 pt)
+        {
+            // As is typical for this type of question, we will solve along
+            // the line treated as a linear space (which requires shifting 
+            // so the line goes through the origin). We will use that to find
+            // the nearest point on the line to the given pt, then just
+            // calculate the distance normally.
+
+            Vector2 relPt = pt - line.Start - pos;
+
+            float axisPart = Math2.Dot(relPt, line.Axis);
+            float nearestAxisPart;
+            if (axisPart < 0)
+                nearestAxisPart = 0;
+            else if (axisPart > line.Magnitude)
+                nearestAxisPart = line.Magnitude;
+            else
+                nearestAxisPart = axisPart;
+
+            Vector2 nearestOnLine = line.Start + pos + nearestAxisPart * line.Axis;
+            return (pt - nearestOnLine).Length();
+        }
+
+        /// <summary>
         /// Create a human-readable representation of this line
         /// </summary>
         /// <returns>human-readable string</returns>
