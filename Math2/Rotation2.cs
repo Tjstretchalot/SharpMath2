@@ -42,18 +42,8 @@ namespace SharpMath2
         {
             if (float.IsInfinity(theta) || float.IsNaN(theta))
                 throw new ArgumentException($"Invalid theta: {theta}", nameof(theta));
-            if (theta < 0)
-            {
-                int numToAdd = (int)Math.Ceiling((-theta) / (Math.PI * 2));
-                theta += (float)Math.PI * 2 * numToAdd;
-            }
-            else if (theta >= Math.PI * 2)
-            {
-                int numToReduce = (int)Math.Floor(theta / (Math.PI * 2));
-                theta -= (float)Math.PI * 2 * numToReduce;
-            }
 
-            Theta = theta;
+            Theta = Standardize(theta);
             CosTheta = cosTheta;
             SinTheta = sinTheta;
         }
@@ -125,6 +115,26 @@ namespace SharpMath2
         public override string ToString()
         {
             return $"{Theta} rads";
+        }
+
+        /// <summary>
+        /// Standardizes the given angle to fall between 0 &lt;= theta &lt; 2 * PI
+        /// </summary>
+        /// <param name="theta">The radian angle to standardize</param>
+        /// <returns>The standardized theta</returns>
+        public static float Standardize(float theta)
+        {
+            if (theta < 0)
+            {
+                int numToAdd = (int)Math.Ceiling((-theta) / (Math.PI * 2));
+                return theta + (float)Math.PI * 2 * numToAdd;
+            }
+            else if (theta >= Math.PI * 2)
+            {
+                int numToReduce = (int)Math.Floor(theta / (Math.PI * 2));
+                return theta - (float)Math.PI * 2 * numToReduce;
+            }
+            return theta;
         }
     }
 }

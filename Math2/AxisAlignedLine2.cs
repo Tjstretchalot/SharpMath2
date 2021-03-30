@@ -111,9 +111,9 @@ namespace SharpMath2
             }
 
             if (strict)
-                return (min1 <= min2 && max1 > min2) || (min2 <= min1 && max2 > min1);
+                return (min1 <= min2 && max1 > min2 + Math2.DEFAULT_EPSILON) || (min2 <= min1 && max2 > min1 + Math2.DEFAULT_EPSILON);
             else
-                return (min1 <= min2 && max1 >= min2) || (min2 <= min1 && max2 >= min1);
+                return (min1 <= min2 && max1 > min2 - Math2.DEFAULT_EPSILON) || (min2 <= min1 && max2 > min1 - Math2.DEFAULT_EPSILON);
         }
 
         /// <summary>

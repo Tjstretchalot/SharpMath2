@@ -103,5 +103,39 @@ namespace SharpMath2
 
             return (r + t) < 1 + Math2.DEFAULT_EPSILON;
         }
+
+        /// <summary>
+        /// An optimized check to determine if a triangle made up of the given
+        /// points strictly contains the origin. This is generally slower than reusing
+        /// a triangle, but much faster than creating a triangle and then doing
+        /// a single contains check. There are aspects of the constructor which
+        /// do not speed up the Contains check, which this skips.
+        /// </summary>
+        /// <param name="vertices">The 3 points making up the triangle</param>
+        /// <returns>True if the given triangle contains the origin, false otherwise</returns>
+        public static bool ContainsOrigin(Vector2[] vertices)
+        {
+            float a = vertices[1].X - vertices[0].X;
+            float b = vertices[2].X - vertices[0].X;
+            float c = vertices[1].Y - vertices[0].Y;
+            float d = vertices[2].Y - vertices[0].Y;
+            float det = a * d - b * c;
+            float invDet = 1 / det;
+            /*{
+                invDet * d, -invDet * b,
+                -invDet * c, invDet * a
+            };*/
+
+            // relPt = -vertices[0]
+            float r = (invDet * d) * (-(vertices[0].X)) + (-invDet * b) * (-(vertices[0].Y));
+            if (r < -Math2.DEFAULT_EPSILON)
+                return false;
+
+            float t = (-invDet * c) * (-(vertices[0].X)) + (invDet * a) * (-(vertices[0].Y));
+            if (t < -Math2.DEFAULT_EPSILON)
+                return false;
+
+            return (r + t) < 1 + Math2.DEFAULT_EPSILON;
+        }
     }
 }

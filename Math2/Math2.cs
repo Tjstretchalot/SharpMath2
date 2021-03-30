@@ -21,9 +21,6 @@ namespace SharpMath2
         /// <summary>
         /// Determines if v1, v2, and v3 are collinear
         /// </summary>
-        /// <remarks>
-        /// Calculates if the area of the triangle of v1, v2, v3 is less than or equal to epsilon.
-        /// </remarks>
         /// <param name="v1">Vector 1</param>
         /// <param name="v2">Vector 2</param>
         /// <param name="v3">Vector 3</param>
@@ -31,7 +28,62 @@ namespace SharpMath2
         /// <returns>If v1, v2, v3 is collinear</returns>
         public static bool IsOnLine(Vector2 v1, Vector2 v2, Vector2 v3, float epsilon = DEFAULT_EPSILON)
         {
-            return AreaOfTriangle(v1, v2, v3) <= epsilon;
+            var fromV1ToV2 = v2 - v1;
+            var axis = Vector2.Normalize(fromV1ToV2);
+            var normal = Perpendicular(axis);
+
+            var fromV1ToV3 = v3 - v1;
+            var normalPortion = Dot(fromV1ToV3, normal);
+
+            return Approximately(normalPortion, 0, epsilon);
+        }
+
+        /// <summary>
+        /// Determines if the given pt is between the line between v1 and v2.
+        /// </summary>
+        /// <param name="v1">The first edge of the line</param>
+        /// <param name="v2">The second edge of the line</param>
+        /// <param name="pt">The point to test</param>
+        /// <param name="epsilon">How close is close enough (not exactly distance)</param>
+        /// <returns>True if pt is on the line between v1 and v2, false otherwise</returns>
+        public static bool IsBetweenLine(Vector2 v1, Vector2 v2, Vector2 pt, float epsilon = DEFAULT_EPSILON)
+        {
+            var fromV1ToV2 = v2 - v1;
+            var axis = Vector2.Normalize(fromV1ToV2);
+            var normal = Perpendicular(axis);
+
+            var fromV1ToPt = pt - v1;
+            var normalPortion = Dot(fromV1ToPt, normal);
+
+            if (!Approximately(normalPortion, 0, epsilon))
+                return false; // not on the infinite line
+
+            var axisPortion = Dot(fromV1ToPt, axis);
+
+            if (axisPortion < -epsilon)
+                return false; // left of the first point
+
+            if (axisPortion > fromV1ToV2.Length() + epsilon)
+                return false; // right of second point
+
+            return true;
+        }
+
+        /// <summary>
+        /// Computes the triple cross product (A X B) X A
+        /// </summary>
+        /// <param name="a">First vector</param>
+        /// <param name="b">Second vector</param>
+        /// <returns>
+        /// Result of projecting to 3 dimensions, performing the
+        /// triple cross product, and then projecting back down to 2 dimensions.
+        /// </returns>
+        public static Vector2 TripleCross(Vector2 a, Vector2 b)
+        {
+            return new Vector2(
+                -a.X * a.Y * b.Y + a.Y * a.Y * b.X,
+                a.X * a.X * b.Y - a.X * a.Y * b.X
+            );
         }
 
         /// <summary>
@@ -69,11 +121,25 @@ namespace SharpMath2
             return x1 * x2 + y1 * y2;
         }
 
+        /// <summary>
+        /// Finds the dot product of the two vectors
+        /// </summary>
+        /// <param name="v1">First vector</param>
+        /// <param name="v2">Second vector</param>
+        /// <returns>The dot product between v1 and v2</returns>
         public static float Dot(Vector2 v1, Vector2 v2)
         {
             return Dot(v1.X, v1.Y, v2.X, v2.Y);
         }
 
+        /// <summary>
+        /// Finds the dot product of two vectors, where one is specified
+        /// by its components
+        /// </summary>
+        /// <param name="v">The first vector</param>
+        /// <param name="x2">The x-value of the second vector</param>
+        /// <param name="y2">The y-value of the second vector</param>
+        /// <returns>The dot product of v and (x2, y2)</returns>
         public static float Dot(Vector2 v, float x2, float y2)
         {
             return Dot(v.X, v.Y, x2, y2);

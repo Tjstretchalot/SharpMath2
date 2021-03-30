@@ -164,7 +164,7 @@ namespace SharpMath2
         }
 
         /// <summary>
-        /// Determines if the specified rectangle and polygon where rect is at pos1 and poly is at pos2 intersect 
+        /// Determines if the specified rectangle and polygon where rect is at pos1 and poly is at pos2 intersect
         /// along the specified axis.
         /// </summary>
         /// <param name="rect">Rectangle</param>
@@ -238,7 +238,7 @@ namespace SharpMath2
         /// Determines the minimum translation that must be applied the specified polygon (at the given position
         /// and rotation) to prevent intersection with the circle (at its given rotation). If the two are not overlapping,
         /// returns null.
-        /// 
+        ///
         /// Returns a tuple of the axis to move the polygon in (unit vector) and the distance to move the polygon.
         /// </summary>
         /// <param name="poly">The polygon</param>
@@ -250,7 +250,7 @@ namespace SharpMath2
         public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly, Circle2 circle, Vector2 pos1, Vector2 pos2, Rotation2 rot1)
         {
             // We have two situations, either the circle is not strictly intersecting the polygon, or
-            // there exists at least one shortest line that you could push the polygon to prevent 
+            // there exists at least one shortest line that you could push the polygon to prevent
             // intersection with the circle.
 
             // That line will either go from a vertix of the polygon to a point on the edge of the circle,
@@ -389,7 +389,7 @@ namespace SharpMath2
         }
 
         /// <summary>
-        /// Determines the minimum translation vector to be applied to the circle to 
+        /// Determines the minimum translation vector to be applied to the circle to
         /// prevent overlap with the rectangle, when they are at their given positions.
         /// </summary>
         /// <param name="circle">The circle</param>
@@ -446,7 +446,7 @@ namespace SharpMath2
                         break;
                     case 3:
                         currVec = rect.UpperRight + pos2;
-                        break; 
+                        break;
                 }
 
                 // Test along circle center -> vector
@@ -533,7 +533,7 @@ namespace SharpMath2
             float min;
             float max;
             fixed(Vector2* pt = points)
-            { 
+            {
                 min = axis.X * (pt[0].X + pos.X) + axis.Y * (pt[0].Y + pos.Y);
                 max = min;
                 for (int i = 1; i < len; i++)
@@ -590,10 +590,10 @@ namespace SharpMath2
             // We're trying to find closestDistance
 
             // Recall that the shortest line from a line to a point will be normal to the line
-            // Thus, the shortest distance from a line to a point can be found by projecting 
-            // the line onto it's own normal vector and projecting the point onto the lines 
+            // Thus, the shortest distance from a line to a point can be found by projecting
+            // the line onto it's own normal vector and projecting the point onto the lines
             // normal vector; the distance between those points is the shortest distance from
-            // the two points. 
+            // the two points.
 
             // The projection of a line onto its normal will be a single point, and will be same
             // for any point on that line. So we pick a point that's convienent (the start or end).
@@ -615,7 +615,7 @@ namespace SharpMath2
             // Step 2
             // We're trying to find closestPoint
 
-            // We can just walk the vector from the center to the closest point, which we know is on 
+            // We can just walk the vector from the center to the closest point, which we know is on
             // the normal axis and the distance closestDistance. However it's helpful to get the signed
             // version End - Start to walk.
             var signedDistanceCircleCenterToLine = lineProjectedOntoItsNormal - centerOfCircleProjectedOntoNormalOfLine;
@@ -643,8 +643,8 @@ namespace SharpMath2
             //
             // (for each "point" in the next paragraph I mean "point projected on the lines axis" but that's wordy)
             //
-            // We know that the start is closest iff EITHER the start is less than the end and the 
-            // closest point is less than the start, OR the start is greater than the end and 
+            // We know that the start is closest iff EITHER the start is less than the end and the
+            // closest point is less than the start, OR the start is greater than the end and
             // closest point is greater than the end.
 
             var closestEdge = Vector2.Zero;
@@ -653,7 +653,7 @@ namespace SharpMath2
             else
                 closestEdge = (closestPointProjectedOntoLineAxis >= lineEndProjectedOntoLineAxis) ? actualLine.Start : actualLine.End;
 
-            // Step 5 
+            // Step 5
             // Circle->Point intersection for closestEdge
 
             var distToCircleFromClosestEdgeSq = (circleCenter - closestEdge).LengthSquared();
@@ -665,9 +665,9 @@ namespace SharpMath2
             // If you had trouble following, see the horizontal and vertical cases which are the same process but the projections
             // are simpler
         }
-        
+
         /// <summary>
-        /// Determines if the circle at the specified position intersects the line, 
+        /// Determines if the circle at the specified position intersects the line,
         /// which is at its true position and rotation, when the line is assumed to be horizontal.
         /// </summary>
         /// <param name="circle">The circle</param>
@@ -801,7 +801,7 @@ namespace SharpMath2
 
         /// <summary>
         /// Determines if the specified polygon at pos1 with no rotation intersects the specified
-        /// 
+        ///
         /// </summary>
         /// <param name="poly"></param>
         /// <param name="rect"></param>
